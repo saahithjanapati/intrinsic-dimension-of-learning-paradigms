@@ -1,2 +1,2 @@
-# learning-intrinsic-dimension
-analyzing learning in LLM's with intrinsic dimension estimation
+# intrinsic-dimension-of-learning
+analyzing learning paradigms in LLM's with intrinsic dimension
