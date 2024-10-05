@@ -1,25 +1,15 @@
 import torch
-import logging
-
-# Set up logging
-logger = logging.getLogger(__name__)
 
 
 def generate_new_texts(model, tokenizer, texts, max_new_tokens=5):
     """
     Generates new texts by appending generated tokens to the input texts.
     """
-    
-    logger.info("Starting text generation...")
-    
+        
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model.to(device)
-    
-    batch_inputs = tokenizer(texts, return_tensors="pt", padding=True).to(device)
-    logger.info(f"Batch inputs tokenized and moved to device {device}.")
+    batch_inputs = tokenizer(texts, return_tensors="pt", padding=True).to('cuda')
     
     with torch.no_grad():
         outputs = model.generate(
@@ -35,7 +25,6 @@ def generate_new_texts(model, tokenizer, texts, max_new_tokens=5):
         new_text = tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
         new_texts.append(new_text)
     
-    logger.info("Text generation completed.")
     return new_texts
 
 
@@ -43,16 +32,12 @@ def generate_new_texts(model, tokenizer, texts, max_new_tokens=5):
 def get_hidden_states_and_logits_for_last_token(prompts, model, tokenizer, verbose=False, padding_side="left"):
     """
     Extracts the hidden states for the last token in each prompt.
-    """
-    
-    logger.info("Starting hidden state extraction for last tokens...")
-    
+    """    
     # Set the padding token
     tokenizer.pad_token = tokenizer.eos_token
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     inputs = tokenizer(prompts, padding=True, return_tensors="pt").to(device)
-    logger.info(f"Prompts tokenized and moved to device {device}.")
     
     # Get model output
     with torch.no_grad():
@@ -60,7 +45,6 @@ def get_hidden_states_and_logits_for_last_token(prompts, model, tokenizer, verbo
     
     # Extract hidden states
     hidden_states = outputs.hidden_states
-    logger.info(f"Hidden states extracted from model.")
     
     input_ids = inputs['input_ids']
     batch_size, seq_len = input_ids.shape
@@ -79,7 +63,7 @@ def get_hidden_states_and_logits_for_last_token(prompts, model, tokenizer, verbo
         last_token_logits = logits[range(batch_size), last_token_indices]
     
     if verbose:
-        logger.info("Verbose mode activated. Printing input details and last token indices.")
+        print("Verbose mode activated. Printing input details and last token indices.")
         for key, value in inputs.items():
             print(f"{key}: {value}")
         print(f"last_token_indices: {last_token_indices}")
@@ -96,7 +80,7 @@ def get_hidden_states_and_logits_for_last_token(prompts, model, tokenizer, verbo
 
 
 
-    logger.info("Hidden state extraction for last tokens completed.")
+    print("Hidden state extraction for last tokens completed.")
     
     del inputs
     del hidden_states

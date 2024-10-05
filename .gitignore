@@ -1,0 +1,5 @@
+slurm_logs/
+.ipynb_checkpoints/
+results/
+wandb/
+__pycache__/

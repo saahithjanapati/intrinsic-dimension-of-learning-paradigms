@@ -14,21 +14,16 @@ from safetensors.torch import save_file
 
 
 
-logger = logging.getLogger(__name__)
 
 def load_config(config_path: str) -> Dict[str, Any]:
     """Loads configuration from a YAML file."""
     try:
-        logger.info(f"Loading configuration from {config_path}")
         with open(config_path, 'r') as file:
             config = yaml.safe_load(file)
-        logger.debug(f"Configuration loaded successfully: {config}")
         return config
     except FileNotFoundError as e:
-        logger.error(f"Config file {config_path} not found: {e}")
         raise
     except yaml.YAMLError as e:
-        logger.error(f"Error parsing YAML file {config_path}: {e}")
         raise
 
 
@@ -59,12 +54,9 @@ def get_batch_size(model_name: str, dataset_name: str, k: int) -> int:
 def write_to_json(obj: Any, path: Path, indent: int = 4) -> None:
     """Writes a Python object to a JSON file."""
     try:
-        logger.info(f"Writing object to {path}")
         with path.open("w") as file:
             json.dump(obj, file, indent=indent)
-        logger.debug(f"Object successfully written to {path}")
     except IOError as e:
-        logger.error(f"Failed to write JSON to {path}: {e}")
         raise
 
 
@@ -87,9 +79,9 @@ def get_num_layers(model_name: str) -> Optional[int]:
     }
     layers = model_layers.get(model_name)
     if layers is None:
-        logger.warning(f"Model name {model_name} not found in the layers dictionary")
+        print(f"Model name {model_name} not found in the layers dictionary")
     else:
-        logger.info(f"Model {model_name} has {layers} layers")
+        print(f"Model {model_name} has {layers} layers")
     return layers
 
 
@@ -103,7 +95,7 @@ def load_model_and_tokenizer(
     """Loads a model and its tokenizer, optionally loading a LoRA adapter."""
     try:
         if lora_adapter_path:
-            logger.info(f"Loading model from LoRA adapter at {lora_adapter_path}")
+            print(f"Loading model from LoRA adapter at {lora_adapter_path}")
             model = AutoPeftModelForCausalLM.from_pretrained(
                 lora_adapter_path, 
                 device_map="auto", 
@@ -113,7 +105,7 @@ def load_model_and_tokenizer(
                 output_attentions=output_attentions
             )
         else:
-            logger.info(f"Loading model {model_name}")
+            print(f"Loading model {model_name}")
             model = AutoModelForCausalLM.from_pretrained(
                 model_name, 
                 cache_dir="/scratch/jax4zk/cache/", 
@@ -124,18 +116,18 @@ def load_model_and_tokenizer(
             )
         
         tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir="/scratch/jax4zk/cache/", padding_side="left")
-        logger.debug(f"Tokenizer padding side: {tokenizer.padding_side}")
-        logger.info(f"Model and tokenizer for {model_name} loaded successfully")
+        print(f"Tokenizer padding side: {tokenizer.padding_side}")
+        print(f"Model and tokenizer for {model_name} loaded successfully")
 
         return model, tokenizer
     except Exception as e:
-        logger.error(f"Failed to load model and tokenizer for {model_name}: {e}")
+        print(f"Failed to load model and tokenizer for {model_name}: {e}")
         raise
 
 
 def set_random_seed(seed: int = 42) -> None:
     """Sets the random seed for reproducibility."""
-    logger.info(f"Setting random seed: {seed}")
+    print(f"Setting random seed: {seed}")
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -143,28 +135,28 @@ def set_random_seed(seed: int = 42) -> None:
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    logger.debug("Random seed set successfully")
+    print("Random seed set successfully")
 
 
 def load_dataset(dataset_name: str, max_length: Optional[int] = None) -> List[Dict[str, Any]]:
     """Loads a dataset from a JSON file."""
     dataset_path = Path('datasets/') / (dataset_name + ".json")
     try:
-        logger.info(f"Loading dataset from {dataset_path}")
+        print(f"Loading dataset from {dataset_path}")
         with dataset_path.open('r') as file:
             dataset = json.load(file)
         
         if max_length is not None:
             dataset = dataset[:max_length]
-            logger.info(f"Dataset truncated to {max_length} entries")
+            print(f"Dataset truncated to {max_length} entries")
 
-        logger.debug(f"Dataset loaded successfully from {dataset_path}")
+        print(f"Dataset loaded successfully from {dataset_path}")
         return dataset
     except FileNotFoundError as e:
-        logger.error(f"Dataset file {dataset_path} not found: {e}")
+        print(f"Dataset file {dataset_path} not found: {e}")
         raise
     except json.JSONDecodeError as e:
-        logger.error(f"Error decoding JSON from {dataset_path}: {e}")
+        print(f"Error decoding JSON from {dataset_path}: {e}")
         raise
 
 
@@ -172,16 +164,16 @@ def load_icl_indices(k: int) -> Dict[int, List[int]]:
     """Loads indices for ICL evaluation."""
     indices_path = Path('data_indices/') / f"icl_indices_{k}_shot.json"
     try:
-        logger.info(f"Loading ICL indices from {indices_path}")
+        print(f"Loading ICL indices from {indices_path}")
         with indices_path.open('r') as file:
             icl_indices = json.load(file)
-        logger.debug(f"ICL indices loaded successfully from {indices_path}")
+        print(f"ICL indices loaded successfully from {indices_path}")
         return icl_indices
     except FileNotFoundError as e:
-        logger.error(f"ICL indices file {indices_path} not found: {e}")
+        print(f"ICL indices file {indices_path} not found: {e}")
         raise
     except json.JSONDecodeError as e:
-        logger.error(f"Error decoding JSON from {indices_path}: {e}")
+        print(f"Error decoding JSON from {indices_path}: {e}")
         raise
 
 
@@ -210,14 +202,12 @@ def normalize_answer(s: str) -> str:
         return text.lower()
 
     normalized = white_space_fix(remove_articles(remove_punc(lower(s))))
-    logger.debug(f"Normalized answer: {normalized}")
     return normalized
 
 
 def exact_match_score(prediction: str, ground_truth: str) -> bool:
     """Only correct if the prediction matches the entire answer."""
     result = normalize_answer(prediction) == normalize_answer(ground_truth)
-    logger.debug(f"Exact match result: {result}")
     return result
 
 
@@ -231,7 +221,6 @@ def first_word_score(prediction: str, ground_truth: str) -> bool:
     else:
         result = len(prediction_words) == len(ground_truth_words)
 
-    logger.debug(f"First word score result: {result}")
     return result
 
 
@@ -239,7 +228,6 @@ def metric_max_over_ground_truths(metric_fn, prediction: str, ground_truths: Lis
     """Pick maximum score across possible answers."""
     scores_for_ground_truths = [metric_fn(prediction, ground_truth) for ground_truth in ground_truths]
     max_score = max(scores_for_ground_truths)
-    logger.debug(f"Max score across ground truths: {max_score}")
     return max_score
 
 
@@ -251,10 +239,8 @@ def parse_generation(output_str: str, target: List[str], metric_fn) -> Tuple[str
     if parsed_str:
         parsed_str = parsed_str[0]
         score = metric_max_over_ground_truths(metric_fn, parsed_str, target)
-        logger.debug(f"Parsed string: {parsed_str}, Score: {score}")
     else:
         parsed_str = ""
         score = 0.0
-        logger.debug(f"No valid string parsed from output. Default score: {score}")
 
     return parsed_str, score

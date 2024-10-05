@@ -10,16 +10,13 @@ from pathlib import Path
 import json
 from tqdm import tqdm
 import traceback
-from safetensors.torch import save_file
-import logging
-import datetime
 
 
 
 def generate_prompts(dataset_name, k, num_eval_items=5000):
     dataset = load_dataset(dataset_name)
     train_set = dataset['train']
-    eval_set = dataset['eval']
+    eval_set = dataset['validation']
 
     prompts, answers = [], []
 
@@ -27,7 +24,7 @@ def generate_prompts(dataset_name, k, num_eval_items=5000):
     icl_indices = load_icl_indices(k)
     for eval_idx in range(num_eval_items):
         prompt = ""
-        indices = icl_indices[eval_idx]
+        indices = icl_indices[str(eval_idx)]
 
         for idx in indices:
             prompt += train_set[idx]['combined'] + "\n\n"
@@ -46,7 +43,7 @@ def generate_prompts(dataset_name, k, num_eval_items=5000):
 def generate_label_set(dataset_name):
     """returns all unique labels in the dataset"""
     dataset = load_dataset(dataset_name)
-    eval_set = dataset['eval']
+    eval_set = dataset['validation']
 
     labels = set()
     for eval_idx in range(len(eval_set)):
@@ -70,7 +67,7 @@ def run_accuracy(model, tokenizer, model_name, dataset_name, k, num_eval_items =
     num_correct = 0
     total_num_samples = 0
 
-    for batch_start_idx in tqdm(range(0, len(prompts)), batch_size):
+    for batch_start_idx in tqdm(range(0, len(prompts), batch_size)):
         batch = dataset[batch_start_idx: batch_start_idx + batch_size]
         
         batch_prompts = [ex["input"] for ex in batch]
@@ -165,8 +162,7 @@ def run_activations(model, tokenizer, model_name, dataset_name, k, num_eval_item
                 }
 
                 # Pick the label that yielded the highest logit
-                top_logit_index = max(logit_values, key=logit_values.get)
-                predicted_label = tokenizer.decode([top_logit_index], skip_special_tokens=True)
+                predicted_label = max(logit_values, key=logit_values.get)
                 correct_label = targets[true_index]
                 is_correct = normalize_answer(predicted_label) == normalize_answer(correct_label)
                 # Save the correctness information
@@ -207,38 +203,22 @@ def main():
     run_activations_flag = config["run_activation"]
 
 
-    # Get the current timestamp when the script starts
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-    # Create a log file name with the timestamp
-    log_filename = f'logs/icl_exp_{timestamp}.log'
-
-    # Configure the root logger with the timestamped log file
-    logging.basicConfig(
-        level=logging.INFO,  # Set the log level
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # Include timestamp in log entries
-        datefmt='%Y-%m-%d %H:%M:%S',  # Custom date format for log entries
-        handlers=[
-            logging.FileHandler(log_filename),  # Create a new log file with the timestamped name
-            logging.StreamHandler()  # Optionally log to console as well
-        ]
-    )
-
-    logger = logging.getLogger(__name__)
-
     for model_name in models:
         model, tokenizer = load_model_and_tokenizer(model_name, output_hidden_states=True)
-        logger.info(f"Model {model_name} loaded successfully.")
+        print(f"Model {model_name} loaded successfully.")
 
         for dataset_name in datasets:
             for k in num_shots:
+
+                if run_activations_flag:
+                    print(f"Running activations for {model_name} on {dataset_name} with {k}-shot.")
+                    run_activations(model, tokenizer, model_name, dataset_name, k)
+                
                 if run_accuracy_flag:
-                    logger.info(f"Running accuracy for {model_name} on {dataset_name} with {k}-shot.")
+                    print(f"Running accuracy for {model_name} on {dataset_name} with {k}-shot.")
                     run_accuracy(model, tokenizer, model_name, dataset_name, k)
                 
-                if run_activations_flag:
-                    logger.info(f"Running activations for {model_name} on {dataset_name} with {k}-shot.")
-                    run_activations(model, tokenizer, model_name, dataset_name, k)
+
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:4   # Specify the 80GB version of the A100
 #SBATCH --cpus-per-task=2
 #SBATCH --time=3-00:00:00
-#SBATCH --chdir=/scratch/jax4zk/icl-lid
+#SBATCH --chdir=/scratch/jax4zk/intrinsic-dimension-of-learning
 #SBATCH --output=slurm_logs/%x-%j.out
 #SBATCH --error=slurm_logs/%x-%j.err
 
