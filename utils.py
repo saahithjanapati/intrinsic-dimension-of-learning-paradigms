@@ -32,6 +32,30 @@ def load_config(config_path: str) -> Dict[str, Any]:
         raise
 
 
+
+def get_batch_size(model_name: str, dataset_name: str, k: int) -> int:
+    seven_b_models = ["meta-llama/Llama-2-7b-hf", "EleutherAI/pythia-6.9b", "mistralai/Mistral-7B-v0.3"]
+    thirteen_b_models = ["meta-llama/Llama-2-13b-hf", "EleutherAI/pythia-12b"]
+    seventy_b_models = ["meta-llama/Llama-2-70b-hf", "meta-llama/Meta-Llama-3-70B", "google/gemma-2-27b"]
+
+    if model_name in seven_b_models:
+        if k == 10:
+            return 4
+        elif k == 5:
+            return 8
+        else:
+            return 16
+    
+    elif model_name in thirteen_b_models:
+        if k == 10:
+            return 2
+        elif k == 5:
+            return 4
+        else:
+            return 8
+
+
+
 def write_to_json(obj: Any, path: Path, indent: int = 4) -> None:
     """Writes a Python object to a JSON file."""
     try:
@@ -141,6 +165,23 @@ def load_dataset(dataset_name: str, max_length: Optional[int] = None) -> List[Di
         raise
     except json.JSONDecodeError as e:
         logger.error(f"Error decoding JSON from {dataset_path}: {e}")
+        raise
+
+
+def load_icl_indices(k: int) -> Dict[int, List[int]]:
+    """Loads indices for ICL evaluation."""
+    indices_path = Path('data_indices/') / f"icl_indices_{k}_shot.json"
+    try:
+        logger.info(f"Loading ICL indices from {indices_path}")
+        with indices_path.open('r') as file:
+            icl_indices = json.load(file)
+        logger.debug(f"ICL indices loaded successfully from {indices_path}")
+        return icl_indices
+    except FileNotFoundError as e:
+        logger.error(f"ICL indices file {indices_path} not found: {e}")
+        raise
+    except json.JSONDecodeError as e:
+        logger.error(f"Error decoding JSON from {indices_path}: {e}")
         raise
 
 

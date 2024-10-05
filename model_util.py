@@ -40,7 +40,7 @@ def generate_new_texts(model, tokenizer, texts, max_new_tokens=5):
 
 
 
-def get_hidden_states_for_last_token(prompts, model, tokenizer, verbose=False, padding_side="left"):
+def get_hidden_states_and_logits_for_last_token(prompts, model, tokenizer, verbose=False, padding_side="left"):
     """
     Extracts the hidden states for the last token in each prompt.
     """
@@ -65,11 +65,18 @@ def get_hidden_states_for_last_token(prompts, model, tokenizer, verbose=False, p
     input_ids = inputs['input_ids']
     batch_size, seq_len = input_ids.shape
     
+
+    last_token_logits = None
+    logits = outputs.logits
+    
     # Determine the index of the last non-padding token
     if padding_side == "left":
         last_token_indices = torch.ones(batch_size, dtype=torch.int).to(device) * (seq_len - 1)
+        last_token_logits = logits[range(batch_size), last_token_indices]
+
     else:  # right padding
         last_token_indices = (input_ids != tokenizer.pad_token_id).long().sum(dim=1) - 1
+        last_token_logits = logits[range(batch_size), last_token_indices]
     
     if verbose:
         logger.info("Verbose mode activated. Printing input details and last token indices.")
@@ -86,6 +93,9 @@ def get_hidden_states_for_last_token(prompts, model, tokenizer, verbose=False, p
         last_token_hidden_states = [layer[i, last_idx].unsqueeze(0) for layer in hidden_states]
         last_hidden_states.append(torch.cat(last_token_hidden_states, dim=0))
     
+
+
+
     logger.info("Hidden state extraction for last tokens completed.")
     
     del inputs
@@ -93,4 +103,4 @@ def get_hidden_states_for_last_token(prompts, model, tokenizer, verbose=False, p
     del outputs
     torch.cuda.empty_cache()
     
-    return last_hidden_states
+    return last_hidden_states, last_token_logits

@@ -1,0 +1,20 @@
+models:
+  - "meta-llama/Llama-2-7b-hf"
+  - "meta-llama/Llama-2-13b-hf"
+  - "meta-llama/meta-llama-3-8b"   # Updated to match other names
+  - "mistralai/Mistral-7B-v0.3"
+
+datasets:
+  - "cola"
+  - "qnli"
+  - "qqp"
+  - "sst2"
+  - "mnli"
+  - "ag_news"
+  - "commonsense_qa"
+  - "mmlu"
+
+num_shots: [1, 2, 5, 10, 0]
+
+run_accuracy: true   # YAML is case-sensitive, ensure this is lowercase
+run_activation: true
