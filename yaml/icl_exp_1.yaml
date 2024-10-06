@@ -1,8 +1,5 @@
 models:
   - "meta-llama/Llama-2-7b-hf"
-  - "meta-llama/Llama-2-13b-hf"
-  - "meta-llama/meta-llama-3-8b"   # Updated to match other names
-  - "mistralai/Mistral-7B-v0.3"
 
 datasets:
   - "cola"

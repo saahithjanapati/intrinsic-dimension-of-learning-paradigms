@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 import json
 import random
@@ -29,7 +28,7 @@ def load_config(config_path: str) -> Dict[str, Any]:
 
 
 def get_batch_size(model_name: str, dataset_name: str, k: int) -> int:
-    seven_b_models = ["meta-llama/Llama-2-7b-hf", "EleutherAI/pythia-6.9b", "mistralai/Mistral-7B-v0.3"]
+    seven_b_models = ["meta-llama/Llama-2-7b-hf", "EleutherAI/pythia-6.9b", "mistralai/Mistral-7B-v0.3", "meta-llama/Meta-Llama-3-8B"]
     thirteen_b_models = ["meta-llama/Llama-2-13b-hf", "EleutherAI/pythia-12b"]
     seventy_b_models = ["meta-llama/Llama-2-70b-hf", "meta-llama/Meta-Llama-3-70B", "google/gemma-2-27b"]
 
@@ -49,6 +48,10 @@ def get_batch_size(model_name: str, dataset_name: str, k: int) -> int:
         else:
             return 8
 
+    elif model_name in seventy_b_models:
+        return 2
+    
+    return 8
 
 
 def write_to_json(obj: Any, path: Path, indent: int = 4) -> None:
@@ -93,6 +96,10 @@ def load_model_and_tokenizer(
     output_attentions: bool = False
 ) -> Tuple[torch.nn.Module, AutoTokenizer]:
     """Loads a model and its tokenizer, optionally loading a LoRA adapter."""
+
+    if model_name == "meta-llama/Meta-Llama-3-70B" or model_name == "meta-llama/Llama-2-70b-hf":
+        load_in_8bit = True
+
     try:
         if lora_adapter_path:
             print(f"Loading model from LoRA adapter at {lora_adapter_path}")

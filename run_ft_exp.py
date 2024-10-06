@@ -10,7 +10,7 @@ from pathlib import Path
 import json
 from tqdm import tqdm
 import traceback
-
+from pathlib import Path
 
 
 def generate_prompts(dataset_name, k, num_eval_items=5000):
@@ -58,7 +58,7 @@ def run_accuracy(model, tokenizer, model_name, dataset_name, k, num_eval_items =
     prompts, targets = generate_prompts(dataset_name, k=k, num_eval_items=num_eval_items)
     dataset = [{"input": prompts[i], "output": targets[i]} for i in range(len(prompts))]
 
-    run = wandb.init(project="icl-accuracy", reinit=True)
+    run = wandb.init(project="ft-accuracy", reinit=True)
     wandb.alert(title=f"ft-Acc-{dataset_name}", text=f"model_name_{model_name}-dataset_name_{dataset_name}")
 
     batch_size = get_batch_size(model_name, dataset_name, k)
@@ -102,9 +102,10 @@ def run_accuracy(model, tokenizer, model_name, dataset_name, k, num_eval_items =
             traceback.print_exc()
             continue
     
+
     accuracy = num_correct / total_num_samples
-    results_path = Path(f"results/icl/accuracy_results/{model_name}/{dataset_name}/{k}-shot/acc-results.json")
-    generations_path = Path(f"results/icl/accuracy_results/{model_name}/{dataset_name}/{k}-shot/generations.json")
+    results_path = Path(f"results/ft/accuracy_results/{model_name}/{dataset_name}/{k}-shot/acc-results.json")
+    generations_path = Path(f"results/ft/accuracy_results/{model_name}/{dataset_name}/{k}-shot/generations.json")
                                 
     results_path.parent.mkdir(parents=True, exist_ok=True)
     
@@ -125,7 +126,7 @@ def run_activations(model, tokenizer, model_name, dataset_name, k, num_eval_item
 
     dataset = [{"input": prompts[i], "output": targets[i]} for i in range(len(prompts))]
 
-    run = wandb.init(project="icl-activations", reinit=True)
+    run = wandb.init(project="ft-activations", reinit=True)
     wandb.alert(title=f"ft-Act-{dataset_name}", text=f"model_name_{model_name}-dataset_name_{dataset_name}")
 
     logit_dict = {}
@@ -170,7 +171,7 @@ def run_activations(model, tokenizer, model_name, dataset_name, k, num_eval_item
                 ############################################################
                                 
                 for layer_idx in range(curr_hidden_state.shape[0]):
-                    save_path = Path(f"results/icl/activations/{model_name}/{dataset_name}/{k}-shot/layer-{layer_idx}/layer_{layer_idx}_index-{true_index}.safetensors")
+                    save_path = Path(f"results/ft/activations/{model_name}/{dataset_name}/{k}-shot/layer-{layer_idx}/layer_{layer_idx}_index-{true_index}.safetensors")
                     save_path.parent.mkdir(parents=True, exist_ok = True)
                     save_tensor_to_file(curr_hidden_state[layer_idx], save_path)
                                 
@@ -182,7 +183,7 @@ def run_activations(model, tokenizer, model_name, dataset_name, k, num_eval_item
             continue
 
 
-        indices_path = Path(f"results/icl/logits/{model_name}/{dataset_name}/{k}-shot/logit_data.json")
+        indices_path = Path(f"results/ft/logits/{model_name}/{dataset_name}/{k}-shot/logit_data.json")
         indices_path.parent.mkdir(parents=True, exist_ok=True)
             
         with open(indices_path, 'w') as f:
@@ -202,25 +203,32 @@ def main():
     run_accuracy_flag = config["run_accuracy"]
     run_activations_flag = config["run_activation"]
 
+    lora_adapter_name = config["adapter_name"]
+
 
     for model_name in models:
-        model, tokenizer = load_model_and_tokenizer(model_name, output_hidden_states=True)
-        print(f"Model {model_name} loaded successfully.")
-
         for dataset_name in datasets:
-            for k in num_shots:
 
+            if lora_adapter_name == 'final':
+                lora_adapter_path = Path(f"finetune-outputs/full-ft/{model_name}/{dataset_name}/final/")
+
+            updated_model_name = model_name + "_" + lora_adapter_name
+
+            model, tokenizer = load_model_and_tokenizer(model_name, output_hidden_states=True, lora_adapter_path = lora_adapter_path)
+            print(f"Model {updated_model_name} loaded successfully.")
+
+            for k in num_shots:
                 if run_activations_flag:
-                    print(f"Running activations for {model_name} on {dataset_name} with {k}-shot.")
-                    run_activations(model, tokenizer, model_name, dataset_name, k)
+                    print(f"Running activations for {updated_model_name} on {dataset_name} with {k}-shot.")
+                    run_activations(model, tokenizer, updated_model_name, dataset_name, k)
                 
                 if run_accuracy_flag:
-                    print(f"Running accuracy for {model_name} on {dataset_name} with {k}-shot.")
-                    run_accuracy(model, tokenizer, model_name, dataset_name, k)
+                    print(f"Running accuracy for {updated_model_name} on {dataset_name} with {k}-shot.")
+                    run_accuracy(model, tokenizer, updated_model_name, dataset_name, k)
         
-        del model
-        del tokenizer
-        torch.cuda.empty_cache()
+            del model
+            del tokenizer
+            torch.cuda.empty_cache()
                 
 
 

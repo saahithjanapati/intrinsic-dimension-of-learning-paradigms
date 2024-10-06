@@ -3,3 +3,5 @@ slurm_logs/
 results/
 wandb/
 __pycache__/
+logs/
+finetune-outputs/

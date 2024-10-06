@@ -1,0 +1,46 @@
+# config.yaml
+
+# General configuration
+model_id: "meta-llama/Meta-Llama-3-8B"  # Pretrained model to be used for fine-tuning
+batch_size: 16  # Batch size per device
+max_seq_length: 1024  # Maximum sequence length
+num_train_epochs: 4  # Number of epochs for training
+load_in_4bit: false  # Load the model in 4-bit precision
+load_in_8bit: false  # Load the model in 8-bit precision
+should_pack: false  # Whether to use packing during training
+
+num_saves_per_epoch: 2
+
+max_train_dataset_length: 1000  # Maximum number of training samples
+max_validation_dataset_length: 100  # Maximum number of validation samples
+
+finetune_type: "full"  # Type of fine-tuning
+
+lora_config:
+  r: 64  # LoRA rank
+  lora_alpha: 16  # LoRA alpha
+  lora_dropout: 0.1  # Dropout rate for LoRA
+  bias: "none"  # Bias handling in LoRA
+  task_type: "CAUSAL_LM"  # Task type for LoRA
+  target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]  # Specific modules to apply LoRA
+
+
+# gradient_checkpointing: true  # Whether to use gradient checkpointing
+# effective_batch_size: 16  # Effective batch size for gradient checkpointing
+# gradient_checkpointing_kwargs: {"use_reentrant": False}
+
+
+datasets:
+  - "mmlu"
+  # - "sst2"
+  # - "cola"
+  # - "qnli"
+  # - "qqp"
+  # - "mnli"
+  # - "ag_news"
+  # - "commonsense_qa"
+
+
+
+# Learning rate configuration
+lr: 1e-4  # Learning rate
