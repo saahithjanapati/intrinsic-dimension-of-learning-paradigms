@@ -11,4 +11,6 @@
 #SBATCH --error=logs/%x-%j.err
 
 
-rm -rf icl-lid/
+# rm -rf icl-lid/
+
+rsync -a --delete empty_dir/ icl-lid/

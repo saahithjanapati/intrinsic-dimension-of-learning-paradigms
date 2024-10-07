@@ -1,0 +1,31 @@
+models:
+  - "mistralai/Mistral-7B-v0.3"
+
+
+# - "meta-llama/Meta-Llama-3-8B"
+# - "meta-llama/Llama-2-7b-hf"
+# - "meta-llama/Llama-2-13b-hf"
+# - "meta-llama/Meta-Llama-3-8B"
+# - "mistralai/Mistral-7B-v0.3"
+
+
+datasets:
+  - "sst2"
+  - "cola"
+  - "qnli"
+  - "qqp"
+  - "mnli"
+  - "ag_news"
+  - "commonsense_qa"
+  - "mmlu"
+
+
+training_set_ids: [0]
+num_training_samples_list: [10]
+
+num_shots: [0]
+
+adapter_name: 'final'
+
+run_accuracy: true   # YAML is case-sensitive, ensure this is lowercase
+run_activation: true

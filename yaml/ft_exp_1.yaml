@@ -2,8 +2,6 @@ models:
   - "meta-llama/Llama-2-13b-hf"
 
 datasets:
-  - "cola"
-  - "qnli"
   - "qqp"
   - "sst2"
   - "mnli"

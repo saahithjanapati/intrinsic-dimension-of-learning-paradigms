@@ -51,7 +51,21 @@ def get_batch_size(model_name: str, dataset_name: str, k: int) -> int:
     elif model_name in seventy_b_models:
         return 2
     
-    return 8
+    else: # using fine-tuned model for 0-shot inference
+        for seven_b_name in seven_b_models:
+            if seven_b_name in model_name:
+                return 8
+
+        return 4
+            
+        # for thirteen_b_name in thirteen_b_models:
+        #     if thirteen_b_name in model_name:
+        #         return 4
+
+        # return 4
+
+
+        
 
 
 def write_to_json(obj: Any, path: Path, indent: int = 4) -> None:
