@@ -1,6 +1,6 @@
 models:
   - "meta-llama/Meta-Llama-3-70B"
-  - "meta-llama/Llama-2-70b-hf"
+  - "meta-llama/Llama-2-13b-hf"
 
 datasets:
   - "cola"

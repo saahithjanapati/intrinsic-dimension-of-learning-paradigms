@@ -79,6 +79,7 @@ def write_to_json(obj: Any, path: Path, indent: int = 4) -> None:
 
 def get_num_layers(model_name: str) -> Optional[int]:
     """Returns the number of layers for a given model name."""
+    
     model_layers = {
         "meta-llama/Llama-2-70b-hf": 81,
         "meta-llama/Llama-2-13b-hf": 41,
@@ -94,11 +95,20 @@ def get_num_layers(model_name: str) -> Optional[int]:
         "google/gemma-2-27b": 47,
         "google/gemma-2-9b": 43,
     }
+
+    # check if the name is within any of the keys
     layers = model_layers.get(model_name)
+    if layers is None:
+        for key in model_layers:
+            if key in model_name:
+                layers = model_layers[key]
+                break
+    
     if layers is None:
         print(f"Model name {model_name} not found in the layers dictionary")
     else:
         print(f"Model {model_name} has {layers} layers")
+    
     return layers
 
 
