@@ -1,10 +1,11 @@
 experiment_type: "ft"
 
 models:
-  - "meta-llama/Meta-Llama-3-8B_final"
-  - "meta-llama/Llama-2-13b-hf_final"
-  - "mistralai/Mistral-7B-v0.3_final"
   - "meta-llama/Llama-2-7b-hf_final"
+  # - "meta-llama/Llama-2-13b-hf_final"
+  # - "meta-llama/Meta-Llama-3-8B_final"
+  # - "mistralai/Mistral-7B-v0.3_final"
+
 
 
 datasets:
