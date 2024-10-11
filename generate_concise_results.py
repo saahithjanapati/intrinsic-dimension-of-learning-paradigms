@@ -12,6 +12,8 @@ def calculate_accuracy(logit_file_path):
     
     return accuracy
 
+
+
 def copy_concise_results(src, dest):
     # Ensure the destination directory exists
     os.makedirs(dest, exist_ok=True)
