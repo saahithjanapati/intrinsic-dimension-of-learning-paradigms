@@ -129,7 +129,7 @@ def generate_main_results_pdf(models, datasets, experiment_types, accuracy_type)
         pdf.cell(200, 10, f"Results for Dataset: {dataset}", ln=True, align="C")
 
         # Create a figure with subplots (4 models * 3 graphs per model = 12 subplots)
-        fig, axs = plt.subplots(4, 3, figsize=(25, 15))  # Increased width for larger graphs
+        fig, axs = plt.subplots(5, 3, figsize=(25, 15))  # Increased width for larger graphs
         fig.tight_layout(pad=5.0)
 
         for model_idx, model in enumerate(models):
@@ -152,9 +152,9 @@ def generate_main_results_pdf(models, datasets, experiment_types, accuracy_type)
             num_layers = get_num_layers(model)
             axs[model_idx, 1].set_prop_cycle(None)  # Reset color cycle for distinct lines
             for exp_type in experiment_types:
-                intrinsic_dims_mle = get_intrinsic_dimensions(model, dataset, exp_type, "mle_50")
+                intrinsic_dims_mle = get_intrinsic_dimensions(model, dataset, exp_type, "twonn")
                 if intrinsic_dims_mle is None:
-                    print(f"Intrinsic dimension (mle_50) data not found for {model} - {exp_type}. Skipping.")
+                    print(f"Intrinsic dimension (twonn) data not found for {model} - {exp_type}. Skipping.")
                     continue  # Skip plotting if there's an error
                 
                 try:
@@ -202,8 +202,11 @@ models = [
     "meta-llama/Llama-2-7b-hf",
     "meta-llama/Llama-2-13b-hf",
     "meta-llama/Meta-Llama-3-8B",
-    "mistralai/Mistral-7B-v0.3"
-]  # Example models, add or change as needed
+    "mistralai/Mistral-7B-v0.3",
+    "meta-llama/Meta-Llama-3-70B"
+]  
+
+# Example models, add or change as needed
 datasets = ["sst2", "cola", "qnli", "qqp", "mnli", "ag_news", "commonsense_qa", "mmlu"]
 experiment_types = ["icl-0", "icl-1", "icl-2", "icl-5", "icl-10", "finetune 1k", "finetune 10"]
 accuracy_type = "logit-accuracy"

@@ -3,15 +3,15 @@ experiment_type: "icl"
 
 
 models:
-  - "meta-llama/Llama-2-13b-hf"
+  # - "meta-llama/Llama-2-13b-hf"
   # - "meta-llama/Meta-Llama-3-8B"
   # - "meta-llama/Llama-2-7b-hf"
   # - "mistralai/Mistral-7B-v0.3"
 
 datasets:
-  # - "qnli"
+  - "qnli"
   # - "commonsense_qa"
-  - "mmlu"
+  # - "mmlu"
   # - "sst2"
   # - "cola"
   # - "qqp"

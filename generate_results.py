@@ -144,10 +144,12 @@ models = [
         "meta-llama/Meta-Llama-3-8B", 
         "mistralai/Mistral-7B-v0.3", 
         "meta-llama/Llama-2-7b-hf", 
-        "meta-llama/Llama-2-13b-hf"]
+        "meta-llama/Llama-2-13b-hf",
+        "meta-llama"
+        ]
 
 datasets = ["sst2", "cola", "qnli", "qqp", "mnli", "ag_news", "commonsense_qa", "mmlu"]
-mle_estimator = "mle_50"
+mle_estimator = "twonn"
 experiment_types = ["icl-0", "icl-1", "icl-2", "icl-5", "icl-10", "finetune 1k", "finetune 10"]
 accuracy_method = "logit-accuracy"
 
@@ -607,8 +609,8 @@ def generate_accuracy_ranking_table():
 #     pass
 
 
-# def generate_single_icl_figure(model="meta-llama/Meta-Llama-3-8B", dataset="mmlu"):
-def generate_single_icl_figure(model="meta-llama/Llama-2-13b-hf", dataset="mmlu"):
+def generate_single_icl_figure(model="meta-llama/Meta-Llama-3-8B", dataset="mmlu"):
+# def generate_single_icl_figure(model="meta-llama/Llama-2-13b-hf", dataset="mmlu"):
     """
     Generate a single ICL figure for a specified model and dataset.
     """
@@ -663,12 +665,13 @@ def generate_single_icl_figure(model="meta-llama/Llama-2-13b-hf", dataset="mmlu"
         axes[1].set_ylabel('Intrinsic Dimension')
         axes[1].legend(title='k')
 
-        # Line plot for AUC of ID curve
+        # Line plot for AUC of ID curve with dots on each point
         auc_df = pd.DataFrame(auc_data)
-        sns.lineplot(x='k', y='AUC', data=auc_df, ax=axes[2], palette='tab10')
+        sns.lineplot(x='k', y='AUC', data=auc_df, ax=axes[2], palette='tab10', marker='o')
         axes[2].set_title(f'Normalized AUC of ID Curve by k\nModel: {model}, Dataset: {dataset}')
         axes[2].set_xlabel('k')
         axes[2].set_ylabel('Normalized AUC')
+        axes[2].set_xticks(k_values)  # Set integer ticks for x-axis
 
         plt.tight_layout()
         plt.savefig(plot_file)
@@ -690,7 +693,7 @@ def generate_expanded_icl_figure():
 
     models = [
         "meta-llama/Llama-2-13b-hf",
-        "meta-llama/Meta-Llama-3-8B"
+        "meta-llama/Meta-Llama-3-8B",
     ]
     datasets = ["qnli", "commonsense_qa", "mmlu"]
     k_values = [0, 1, 2, 5, 7, 10, 12, 14, 16, 18, 20]
@@ -762,6 +765,58 @@ def generate_expanded_icl_figure():
 
 
 
+def generate_id_by_layer_for_checkpoints(
+    # model = "meta-llama/Llama-2-8b-hf", 
+    model = "meta-llama/Meta-Llama-3-8B",
+    dataset = "mmlu", 
+    split = "validation"):
+
+    # Define checkpoints
+    # checkpoints = [0, 62, 124, 186, 248, 310, 372, 434, 496, 558, 620, 682, 744, 806, 868, 930]
+    checkpoints = [0, 62, 124, 186, 248, 310, 372, 434, 496, 558, 620, 682, 744, 806, 868, 930]
+
+    # Prepare data for the plot
+    id_data = {checkpoint: [] for checkpoint in checkpoints}
+
+    for checkpoint in checkpoints:
+        id_values = get_intrinsic_dimensions(model, dataset, "detailed-ft", mle_estimator, checkpoint, split)
+        if id_values is not None:
+            id_data[checkpoint] = id_values
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    # Use a gradient from red to blue
+    palette = sns.color_palette("coolwarm", len(checkpoints))
+
+    for idx, (checkpoint, id_values) in enumerate(id_data.items()):
+        if id_values:
+            color = palette[idx]  # Get color from the palette
+            plt.plot(range(1, len(id_values) + 1), id_values, label=f'{checkpoint}', color=color)
+
+    plt.title(f'Intrinsic Dimension by Layer\nModel: {model}, Dataset: {dataset}, Split: {split}')
+    plt.xlabel('Layer Index')
+    plt.ylabel('Intrinsic Dimension')
+    plt.legend(title='# Training Steps', loc='upper right')
+    plt.tight_layout()
+
+    # Save or show the plot
+    results_dir = "results_and_figures"
+    os.makedirs(results_dir, exist_ok=True)
+    plot_file = Path(results_dir) / f"id_by_layer_single.pdf"
+    plt.savefig(plot_file)
+    plt.close()
+
+    print(f"Plot saved to {plot_file}")
+
+# Example usage:
+# plot_id_by_layer_for_checkpoints("meta-llama/Llama-2-13b-hf", "qnli", "train")
+
+# Example usage:
+# plot_id_by_layer_for_checkpoints("meta-llama/Llama-2-13b-hf", "qnli", "train")
+
+
+
+
 
 def generate_detailed_ft():
     import matplotlib.pyplot as plt
@@ -771,7 +826,7 @@ def generate_detailed_ft():
     # Define models, datasets, and checkpoints
     models = ["meta-llama/Llama-2-13b-hf", "meta-llama/Meta-Llama-3-8B"]
     datasets = ["qnli", "commonsense_qa", "mmlu"]
-    checkpoints = [62, 124, 186, 248, 310, 372, 434, 496, 558, 620, 682, 744, 806, 868, 930]
+    checkpoints = [0, 62, 124, 186, 248, 310, 372, 434, 496, 558, 620, 682, 744, 806, 868, 930]
 
     results_dir = "results_and_figures"
     os.makedirs(results_dir, exist_ok=True)
@@ -1046,7 +1101,8 @@ def main():
         "id_range_boxplot",
         "generate_expanded_icl",
         "generate_detailed_ft_pdf",
-        "generate_single_icl_expanded"
+        "generate_single_icl_expanded",
+        "id_by_layer_for_checkpoints"
         ]
 
 
@@ -1088,6 +1144,8 @@ def main():
     if args.figure == "generate_detailed_ft_pdf":
         generate_detailed_ft()
 
+    if args.figure == "id_by_layer_for_checkpoints":
+        generate_id_by_layer_for_checkpoints()
 
     if args.figure == "all":
         generate_all()

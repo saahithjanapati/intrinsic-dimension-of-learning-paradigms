@@ -1,12 +1,12 @@
 models:
-  # - "meta-llama/Meta-Llama-3-8B"
-  - "meta-llama/Llama-2-13b-hf"
+  - "meta-llama/Meta-Llama-3-8B"
+  # - "meta-llama/Llama-2-13b-hf"
 
 
 datasets:
   # - "qnli"
-  # - "commonsense_qa"
-  - "mmlu"
+  - "commonsense_qa"
+  # - "mmlu"
 
   # - "qqp"
   # - "sst2"

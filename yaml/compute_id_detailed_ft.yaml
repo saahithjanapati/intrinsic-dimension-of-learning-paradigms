@@ -7,7 +7,7 @@ models:
 
 datasets:
   - "qnli"
-  - "commonsense_qa"
+  # - "commonsense_qa"
   # - "mmlu"
 
 
