@@ -34,6 +34,15 @@ def fetch_tensors_for_few_sample_ft_experiment(model_name, dataset_name, k, laye
 
 
 
+def fetch_tensors_for_detailed_ft_experiment(model_name, dataset_name, k, layer_idx, checkpoint_number, split_name):
+    path_to_tensors = Path(f"results/detailed-ft/activations/{model_name}_checkpoint_{checkpoint_number}/{dataset_name}/{split_name}/{k}-shot/layer-{layer_idx}")
+    print("path_to_tensors:", path_to_tensors)
+    if not path_to_tensors.exists():
+        return None, None
+    return fetch_tensors(path_to_tensors)
+
+
+
 def process_layers(models, datasets, k_values, methods, fetch_function, result_path_template, **fetch_kwargs):
     for model_name in models:
         for dataset_name in datasets:
@@ -129,6 +138,34 @@ def run_few_sample_ft_experiment(config):
             )
 
 
+#     """
+#     I have data stored in the following file structure:
+#         - results/detailed-ft/<model_name>_checkpoint_{checkpoint_number}/{dataset}/{split_name}/{k}-shot/layer-{layer_idx}/
+
+#     the config file will contain a list of models, datasaets, num_shots, and methods
+#     it will also contain list of checkpoint numbers that need to be processed as well as the split names
+#     I need to run the method for each combo of checkpoint number and split
+#     can you write the run method, and the fetch tensor method for this functionality?
+#     """
+
+
+def run_detailed_ft_experiment(config):
+    for checkpoint_number in config['checkpoint_numbers']:
+        for split_name in config['split_names']:
+            
+            str1 = f"{checkpoint_number}"
+            str2 = f"{split_name}"
+
+            process_layers(
+                config['models'],
+                config['datasets'],
+                config['num_shots'],
+                config['methods'],
+                fetch_tensors_for_detailed_ft_experiment,
+                "results/id/detailed-ft/{model_name}_checkpoint_" + str1 + "/{dataset_name}/" + str2 + "/{k}-shot/{method_name}.json",
+                checkpoint_number = checkpoint_number,  # Ensure this is passed correctly
+                split_name=split_name
+            )
 
 def main():
     path_to_yaml = sys.argv[1]
@@ -136,10 +173,15 @@ def main():
 
     if config['experiment_type'] == 'icl':
         run_icl_experiment(config)
+    
     elif config['experiment_type'] == 'ft':
         run_ft_experiment(config)
+
     elif config['experiment_type'] == 'few_ft':
         run_few_sample_ft_experiment(config)
+    
+    elif config['experiment_type'] == 'detailed_ft':
+        run_detailed_ft_experiment(config)
 
 if __name__ == "__main__":
     main()

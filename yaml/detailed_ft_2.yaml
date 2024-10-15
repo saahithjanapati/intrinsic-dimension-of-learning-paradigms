@@ -1,20 +1,21 @@
 # config.yaml
 
 # General configuration
-model_id: "EleutherAI/pythia-12b"  # Pretrained model to be used for fine-tuning
+model_id: "meta-llama/Meta-Llama-3-8B"  # Pretrained model to be used for fine-tuning
+# model_id: "meta-llama/Llama-2-13b-hf"  # Pretrained model to be used for fine-tuning
 batch_size: 16  # Batch size per device
 max_seq_length: 1024  # Maximum sequence length
-num_train_epochs: 4  # Number of epochs for training
+num_train_epochs: 15  # Number of epochs for training
 load_in_4bit: false  # Load the model in 4-bit precision
 load_in_8bit: false  # Load the model in 8-bit precision
 should_pack: false  # Whether to use packing during training
 
-num_saves_per_epoch: 2
+num_saves_per_epoch: 1
 
 max_train_dataset_length: 1000  # Maximum number of training samples
 max_validation_dataset_length: 100  # Maximum number of validation samples
 
-finetune_type: "full"  # Type of fine-tuning
+finetune_type: "detailed"  # Type of fine-tuning
 
 
 lora_config:
@@ -33,15 +34,8 @@ lora_config:
 
 datasets:
   - "mmlu"
-  - "sst2"
-  - "cola"
   - "qnli"
-  - "qqp"
-  - "mnli"
-  - "ag_news"
   - "commonsense_qa"
-
-
 
 # Learning rate configuration
 lr: 1e-4  # Learning rate

@@ -1,0 +1,30 @@
+experiment_type: "detailed_ft"
+
+models:
+  - "meta-llama/Llama-2-13b-hf"
+  # - "meta-llama/Meta-Llama-3-8B"
+
+
+datasets:
+  - "qnli"
+  - "commonsense_qa"
+  # - "mmlu"
+
+
+num_shots:
+  - 0
+
+
+checkpoint_numbers: [0]
+# checkpoint_numbers: [62, 124, 186, 248, 310, 372, 434, 496]
+# checkpoint_numbers: [558, 620, 682, 744, 806, 868, 930]
+
+split_names: ['train', 'validation']
+
+methods:
+  - ["mle", 15]
+  - ["mle", 25]
+  - ["mle", 50]
+  - ["mle", 75]
+  - ["mle", 100]
+  - ["twonn", ]

@@ -1,18 +1,11 @@
 models:
   - "meta-llama/Meta-Llama-3-70B"
-  - "meta-llama/Llama-2-13b-hf"
 
 datasets:
-  - "cola"
-  - "qnli"
-  - "qqp"
-  - "sst2"
-  - "mnli"
-  - "ag_news"
   - "commonsense_qa"
   - "mmlu"
 
 num_shots: [1, 2, 5, 10, 0]
 
-run_accuracy: true   # YAML is case-sensitive, ensure this is lowercase
+run_accuracy: false   # YAML is case-sensitive, ensure this is lowercase
 run_activation: true

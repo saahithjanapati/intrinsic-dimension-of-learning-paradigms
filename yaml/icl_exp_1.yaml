@@ -13,5 +13,5 @@ datasets:
 
 num_shots: [1, 2, 5, 10, 0]
 
-run_accuracy: true   # YAML is case-sensitive, ensure this is lowercase
+run_accuracy: false   # YAML is case-sensitive, ensure this is lowercase
 run_activation: true

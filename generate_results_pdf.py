@@ -107,7 +107,18 @@ def get_num_layers(model_name):
     return layers
 
 
-def generate_pdf(models, datasets, experiment_types, accuracy_type):
+
+def generate_expanded_icl_pdf(model, datasets, k_shots, accuracy_type):
+    experiment_types = []
+    for k in k_shots:
+        experiment_types.append(f"icl-{k}")
+    
+    
+
+
+
+
+def generate_main_results_pdf(models, datasets, experiment_types, accuracy_type):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
 
@@ -198,4 +209,4 @@ experiment_types = ["icl-0", "icl-1", "icl-2", "icl-5", "icl-10", "finetune 1k",
 accuracy_type = "logit-accuracy"
 
 # Generate the PDF
-generate_pdf(models, datasets, experiment_types, accuracy_type)
+generate_main_results_pdf(models, datasets, experiment_types, accuracy_type)

@@ -25,8 +25,6 @@ def fetch_tensors(path):
 
 
 
-
-
 def calculate_lid(data, k=25, random_neighbors=False, verbose=False):
     # Step 1: Compute all pairwise Euclidean distances
     

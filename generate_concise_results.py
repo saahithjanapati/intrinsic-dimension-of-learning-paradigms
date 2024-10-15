@@ -19,7 +19,7 @@ def copy_concise_results(src, dest):
     os.makedirs(dest, exist_ok=True)
 
     # Define the subdirectories to copy
-    subdirs_to_copy = ['few-sample-ft', 'ft', 'icl']
+    subdirs_to_copy = ['few-sample-ft', 'ft', 'icl', 'detailed-ft']
 
     for subdir in subdirs_to_copy:
         src_path = os.path.join(src, subdir, 'accuracy_results')
@@ -38,11 +38,11 @@ def copy_concise_results(src, dest):
                     else:
                         shutil.copy2(s, d)
 
-            # Process logits to calculate accuracy
-            logits_path = os.path.join(src, subdir, 'logits')
-            if os.path.exists(logits_path):
-                for root, _, files in os.walk(logits_path):
-                    for file in files:
+        # Process logits to calculate accuracy
+        logits_path = os.path.join(src, subdir, 'logits')
+        if os.path.exists(logits_path):
+            for root, _, files in os.walk(logits_path):
+                for file in files:
                         if file.endswith('logit_data.json'):
                             logit_file_path = os.path.join(root, file)
                             accuracy = calculate_accuracy(logit_file_path)

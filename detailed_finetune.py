@@ -19,10 +19,9 @@ def get_train_args(config, output_dir, train_dataset_length=1000):
     return training arguments from the provided config
     """
     steps_per_epoch = train_dataset_length // config.batch_size
-
     save_steps = steps_per_epoch // config.num_saves_per_epoch
-    logging_steps = steps_per_epoch // 4
 
+    logging_steps = steps_per_epoch // 4
     training_args = TrainingArguments(
         output_dir = output_dir,
         report_to="wandb",
@@ -55,8 +54,10 @@ def get_train_args(config, output_dir, train_dataset_length=1000):
 
 
 def generate_ft_output_path(config, dataset_name):
-    if config.finetune_type == "full":
-        return Path(f"finetune-outputs/full-ft/{config.model_id}/{dataset_name}/")
+    if config.finetune_type == "detailed":
+        output_path = Path(f"finetune-outputs/detailed-ft/{config.model_id}/{dataset_name}/")
+        print(f"ft_output_path: {output_path}")
+        return output_path
 
     else:
         # TODO: add logic for managing the different ft runs needed for few-sample finetuning
@@ -103,7 +104,7 @@ def main():
             sys.exit(1)
 
 
-        wandb.init(project='full-ft', job_type="train", config=config)
+        wandb.init(project='detailed-ft', job_type="train", config=config)
 
         train_dataset = train_dataset.select(range(min(config.max_train_dataset_length, len(train_dataset))))
         eval_dataset = eval_dataset.select(range(min(config.max_validation_dataset_length, len(eval_dataset))))

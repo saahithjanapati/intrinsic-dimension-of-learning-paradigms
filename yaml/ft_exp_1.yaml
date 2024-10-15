@@ -1,5 +1,5 @@
 models:
-  - "meta-llama/Llama-2-13b-hf"
+  - "meta-llama/Meta-Llama-3-70B"
 
 datasets:
   - "qqp"
@@ -8,10 +8,13 @@ datasets:
   - "ag_news"
   - "commonsense_qa"
   - "mmlu"
+  - "qnli"
+  - "cola"
 
 num_shots: [0]
 
 adapter_name: 'final'
 
-run_accuracy: true   # YAML is case-sensitive, ensure this is lowercase
+
+run_accuracy: false   # YAML is case-sensitive, ensure this is lowercase
 run_activation: true

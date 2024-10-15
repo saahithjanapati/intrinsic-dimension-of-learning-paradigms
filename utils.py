@@ -27,23 +27,24 @@ def load_config(config_path: str) -> Dict[str, Any]:
 
 
 
+
 def get_batch_size(model_name: str, dataset_name: str, k: int) -> int:
     seven_b_models = ["meta-llama/Llama-2-7b-hf", "EleutherAI/pythia-6.9b", "mistralai/Mistral-7B-v0.3", "meta-llama/Meta-Llama-3-8B"]
     thirteen_b_models = ["meta-llama/Llama-2-13b-hf", "EleutherAI/pythia-12b"]
     seventy_b_models = ["meta-llama/Llama-2-70b-hf", "meta-llama/Meta-Llama-3-70B", "google/gemma-2-27b"]
 
     if model_name in seven_b_models:
-        if k == 10:
-            return 4
-        elif k == 5:
+        if k >= 10:
+            return 2
+        elif k >= 5:
             return 8
         else:
             return 16
     
     elif model_name in thirteen_b_models:
-        if k == 10:
+        if k >= 10:
             return 2
-        elif k == 5:
+        elif k >= 5:
             return 4
         else:
             return 8

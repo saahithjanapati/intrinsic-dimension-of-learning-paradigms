@@ -43,11 +43,11 @@ def get_train_args(config, output_dir, train_dataset_length):
     # if hasattr(config, 'effective_batch_size'):
     #     training_args.gradient_accumulation_steps = config.effective_batch_size // config.batch_size
 
-    # if hasattr(config, 'gradient_checkpointing'):
-    #     training_args.gradient_checkpointing = config.gradient_checkpointing
+    if hasattr(config, 'gradient_checkpointing'):
+        training_args.gradient_checkpointing = config.gradient_checkpointing
 
-    # if hasattr(config, 'gradient_checkpointing_kwargs'):
-    #     training_args.gradient_checkpointing_kwargs = config.gradient_checkpointing_kwargs
+    if hasattr(config, 'gradient_checkpointing_kwargs'):
+        training_args.gradient_checkpointing_kwargs = config.gradient_checkpointing_kwargs
 
     return training_args
 

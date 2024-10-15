@@ -1,0 +1,17 @@
+models:
+  - "meta-llama/Llama-2-13b-hf"
+
+datasets:
+  - "mmlu"
+  # - "ag_news"
+  # - "commonsense_qa"
+  # - "cola"
+  # - "qnli"
+  # - "qqp"
+  # - "sst2"
+  # - "mnli"
+
+num_shots: [0]
+
+run_accuracy: false   # YAML is case-sensitive, ensure this is lowercase
+run_activation: true
