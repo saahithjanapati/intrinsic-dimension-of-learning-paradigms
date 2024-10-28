@@ -54,8 +54,10 @@ def get_train_args(config, output_dir, train_dataset_length=1000):
 
 
 def generate_ft_output_path(config, dataset_name):
+    lora_r = config.lora_config['r']
+
     if config.finetune_type == "detailed":
-        output_path = Path(f"finetune-outputs/detailed-ft/{config.model_id}/{dataset_name}/")
+        output_path = Path(f"finetune-outputs/detailed-ft/{config.model_id}-lora_r_{lora_r}/{dataset_name}/")
         print(f"ft_output_path: {output_path}")
         return output_path
 
@@ -72,6 +74,9 @@ def main():
     config = SimpleNamespace(**config_dict)
 
     for dataset_name in config.datasets:
+
+        print("Finetuining on dataset: ", dataset_name)
+
         model = AutoModelForCausalLM.from_pretrained(
             config.model_id,
             device_map = "auto",

@@ -19,7 +19,7 @@ finetune_type: "detailed"  # Type of fine-tuning
 
 
 lora_config:
-  r: 64  # LoRA rank
+  r: 128  # LoRA rank
   lora_alpha: 16  # LoRA alpha
   lora_dropout: 0.1  # Dropout rate for LoRA
   bias: "none"  # Bias handling in LoRA
@@ -34,8 +34,14 @@ lora_config:
 
 datasets:
   - "mmlu"
-  - "qnli"
-  - "commonsense_qa"
+  # - "qnli"
+  # - "commonsense_qa"
+  # - "ag_news"
+  # - "cola"
+  # - "sst2"
+  # - "qqp"
+  # - "commonsense_qa"
+
 
 # Learning rate configuration
 lr: 1e-4  # Learning rate

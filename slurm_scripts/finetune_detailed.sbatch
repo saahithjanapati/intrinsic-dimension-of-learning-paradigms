@@ -4,7 +4,7 @@
 
 #SBATCH -A uvailp
 #SBATCH -p gpu
-#SBATCH --gres=gpu:a6000:6   # Specify the 80GB version of the A100
+#SBATCH --gres=gpu:a6000:5   # Specify the 80GB version of the A100
 #SBATCH --cpus-per-task=2
 #SBATCH --time=1-00:00:00
 #SBATCH --chdir=/scratch/jax4zk/intrinsic-dimension-of-learning
@@ -12,9 +12,10 @@
 #SBATCH --error=logs/%x-%j.err
 
 
-module load anaconda
 module load cuda
 module load cudnn
+module load miniforge
+
 
 conda activate lid
 

@@ -4,8 +4,7 @@
 
 #SBATCH -A uvailp
 #SBATCH -p gpu
-#SBATCH --gres=gpu:a6000:4   # Specify the 80GB version of the A100
-#SBATCH --cpus-per-task=2
+#SBATCH --gres=gpu:a40:6   # Specify the 80GB version of the A100
 #SBATCH --time=1-00:00:00
 #SBATCH --chdir=/scratch/jax4zk/intrinsic-dimension-of-learning
 #SBATCH --output=logs/%x-%j.out
