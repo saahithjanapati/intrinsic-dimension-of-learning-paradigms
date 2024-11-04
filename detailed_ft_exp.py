@@ -142,19 +142,28 @@ def main():
     lora_checkpoints = config["lora_checkpoints"]
     splits = ["train", "validation"]
 
+    lora_r = config.get("lora_r", 64)
+
     for model_name in models:
         for dataset_name in datasets:
             for checkpoint_num in lora_checkpoints:
 
-                lora_adapter_path = Path(f"finetune-outputs/detailed-ft/{model_name}/{dataset_name}/checkpoint-{checkpoint_num}/")
-                updated_model_name = model_name + "_" + f"checkpoint_{checkpoint_num}"
+
+                if lora_r == 64:
+                    lora_adapter_path = Path(f"finetune-outputs/detailed-ft/{model_name}/{dataset_name}/checkpoint-{checkpoint_num}/")
+                    updated_model_name = model_name + "_" + f"checkpoint_{checkpoint_num}"
+                
+                else:
+                    print(f"Running for lora_r = {lora_r}")
+                    lora_adapter_path = Path(f"finetune-outputs/detailed-ft/{model_name}-lora_r_{lora_r}/{dataset_name}/checkpoint-{checkpoint_num}/")
+                    updated_model_name = model_name + f"-lora_r_{lora_r}" + "_" + f"checkpoint_{checkpoint_num}"
 
 
                 if checkpoint_num == 0:
                     model, tokenizer = load_model_and_tokenizer(model_name, output_hidden_states=True)
 
                 else:
-                    model, tokenizer = load_model_and_tokenizer(model_name, output_hidden_states=True, lora_adapter_path = lora_adapter_path)
+                    model, tokenizer = load_model_and_tokenizer(model_name, output_hidden_states=True, lora_adapter_path=lora_adapter_path)
                     print(f"Model {updated_model_name} loaded successfully.")
 
                 for split_name in splits:

@@ -3,34 +3,35 @@ experiment_type: "icl"
 
 
 models:
+  - "meta-llama/Meta-Llama-3-8B"
   # - "meta-llama/Llama-2-13b-hf"
-  # - "meta-llama/Meta-Llama-3-8B"
   # - "meta-llama/Llama-2-7b-hf"
   # - "mistralai/Mistral-7B-v0.3"
 
 datasets:
-  - "qnli"
-  # - "commonsense_qa"
-  # - "mmlu"
-  # - "sst2"
-  # - "cola"
-  # - "qqp"
-  # - "mnli"
-  # - "ag_news"
+  # - "ag_news-deduped"
+  # - "qnli-deduped"
+  - "qqp-deduped"
 
 
 num_shots:
+  - 0
+  - 1
+  - 2
+  - 5
+  - 10
+  - 12
+  - 14
+  - 16
+  - 18
+  - 20
   # - 7
   # - 12
   # - 14
   # - 16
   # - 18
   # - 20
-  - 0
-  # - 1
-  # - 2
-  # - 5
-  # - 10
+
 
 
 methods:

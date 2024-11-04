@@ -1,17 +1,30 @@
 models:
   - "meta-llama/Meta-Llama-3-8B"   # Updated to match other names
 
+
+
 datasets:
-  - "cola"
-  - "qnli"
+  # - "ag_news"
+  # - "mnli"
+  # - "qnli"
   - "qqp"
-  - "sst2"
-  - "mnli"
-  - "ag_news"
-  - "commonsense_qa"
-  - "mmlu"
 
-num_shots: [1, 2, 5, 10, 0]
+num_shots: [0, 1, 2, 5, 10, 12, 14, 16, 18, 20]
 
-run_accuracy: true   # YAML is case-sensitive, ensure this is lowercase
+run_accuracy: false   # YAML is case-sensitive, ensure this is lowercase
 run_activation: true
+
+
+is_deduped: True
+
+
+
+# datasets:
+#   - "cola"
+#   - "qnli"
+#   - "qqp"
+#   - "sst2"
+#   - "mnli"
+#   - "ag_news"
+#   - "commonsense_qa"
+#   - "mmlu"

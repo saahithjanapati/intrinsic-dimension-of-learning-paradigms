@@ -13,15 +13,21 @@ import traceback
 
 
 
-def generate_prompts(dataset_name, k, num_eval_items=5000):
+def generate_prompts(dataset_name, k, num_eval_items=5000, is_deduped=False):
+    if is_deduped:
+        deduped_dataset = load_dataset(f"deduped_train_{dataset_name}")
+    
     dataset = load_dataset(dataset_name)
-    train_set = dataset['train']
-    eval_set = dataset['validation']
 
+    train_set = dataset['train']
+    if is_deduped:
+        train_set = deduped_dataset['train']
+
+    eval_set = dataset['validation']
     prompts, answers = [], []
 
     # load icl indices
-    icl_indices = load_icl_indices(k)
+    icl_indices = load_icl_indices(k, is_depduped=is_deduped)
     for eval_idx in range(num_eval_items):
         prompt = ""
         indices = icl_indices[str(eval_idx)]
@@ -120,10 +126,15 @@ def run_accuracy(model, tokenizer, model_name, dataset_name, k, num_eval_items =
         json.dump(all_generations, f)
 
 
-def run_activations(model, tokenizer, model_name, dataset_name, k, num_eval_items = 5000):
-    prompts, targets = generate_prompts(dataset_name, k=k, num_eval_items=num_eval_items)
+def run_activations(model, tokenizer, model_name, dataset_name, k, num_eval_items = 5000, is_dedpued=False):
 
+    prompts, targets = generate_prompts(dataset_name, k=k, num_eval_items=num_eval_items, is_deduped=is_dedpued)
     dataset = [{"input": prompts[i], "output": targets[i]} for i in range(len(prompts))]
+    
+    if is_dedpued:
+        mod_dataset_name = f"{dataset_name}-deduped"
+    else:
+        mod_dataset_name = dataset_name
 
     run = wandb.init(project="icl-activations", reinit=True)
     wandb.alert(title=f"ft-Act-{dataset_name}", text=f"model_name_{model_name}-dataset_name_{dataset_name}")
@@ -170,19 +181,17 @@ def run_activations(model, tokenizer, model_name, dataset_name, k, num_eval_item
                 ############################################################
                                 
                 for layer_idx in range(curr_hidden_state.shape[0]):
-                    save_path = Path(f"results/icl/activations/{model_name}/{dataset_name}/{k}-shot/layer-{layer_idx}/layer_{layer_idx}_index-{true_index}.safetensors")
+                    save_path = Path(f"results/icl/activations/{model_name}/{mod_dataset_name}/{k}-shot/layer-{layer_idx}/layer_{layer_idx}_index-{true_index}.safetensors")
                     save_path.parent.mkdir(parents=True, exist_ok = True)
                     save_tensor_to_file(curr_hidden_state[layer_idx], save_path)
                                 
-            
         except Exception as e:
             print(f"ERROR on batch with start idx: {batch_start_idx}")
             print(e)
             traceback.print_exc()
             continue
 
-
-        indices_path = Path(f"results/icl/logits/{model_name}/{dataset_name}/{k}-shot/logit_data.json")
+        indices_path = Path(f"results/icl/logits/{model_name}/{mod_dataset_name}/{k}-shot/logit_data.json")
         indices_path.parent.mkdir(parents=True, exist_ok=True)
             
         with open(indices_path, 'w') as f:
@@ -202,6 +211,8 @@ def main():
     run_accuracy_flag = config["run_accuracy"]
     run_activations_flag = config["run_activation"]
 
+    is_deduped = config.get("is_deduped", False)
+
 
     for model_name in models:
         model, tokenizer = load_model_and_tokenizer(model_name, output_hidden_states=True)
@@ -212,7 +223,7 @@ def main():
 
                 if run_activations_flag:
                     print(f"Running activations for {model_name} on {dataset_name} with {k}-shot.")
-                    run_activations(model, tokenizer, model_name, dataset_name, k)
+                    run_activations(model, tokenizer, model_name, dataset_name, k, is_dedpued=is_deduped)
                 
                 if run_accuracy_flag:
                     print(f"Running accuracy for {model_name} on {dataset_name} with {k}-shot.")

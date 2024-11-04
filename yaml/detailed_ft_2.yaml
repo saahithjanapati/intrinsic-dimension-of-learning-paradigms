@@ -33,13 +33,13 @@ lora_config:
 
 
 datasets:
-  - "mmlu"
-  # - "ag_news"
-  # - "cola"
-  # - "sst2"
-  # - "qqp"
-  # - "commonsense_qa"
-  # - "qnli"
+  - "mnli"
+  - "ag_news"
+  - "cola"
+  - "sst2"
+  - "qqp"
+  - "commonsense_qa"
+  - "qnli"
 
 # Learning rate configuration
 lr: 1e-4  # Learning rate

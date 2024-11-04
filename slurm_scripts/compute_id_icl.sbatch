@@ -4,7 +4,7 @@
 #SBATCH -A uvailp
 #SBATCH -p standard
 #SBATCH --cpus-per-task=3
-#SBATCH --time=0-7:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --chdir=/scratch/jax4zk/intrinsic-dimension-of-learning
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err

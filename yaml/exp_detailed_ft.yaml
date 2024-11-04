@@ -3,20 +3,38 @@ models:
   # - "meta-llama/Llama-2-13b-hf"
 
 
-datasets:
-  # - "qnli"
-  - "commonsense_qa"
-  # - "mmlu"
+lora_r: 32
 
+datasets:
+  # - "mnli"
   # - "qqp"
   # - "sst2"
-  # - "ag_news"
-  # - "cola"
+  - "ag_news"
+  - "cola"
+  - "qnli"
+  - "commonsense_qa"
+
+  # - "mmlu"
 
 
 num_shots: [0]
 
-lora_checkpoints: [0]
+
+lora_checkpoints: [62, 496, 930]
+
+
+# lora_checkpoints: [620, 682, 744, 806, 868, 930]
+# lora_checkpoints: [930, 868, 806]
+
+
+# lora_checkpoints: [0, 62, 124, 186]
+# lora_checkpoints: [248, 310, 372, 434]
+# lora_checkpoints: [496, 558, 620, 682]
+# lora_checkpoints: [744, 806, 868, 930]
+
+
+# lora_checkpoints: [0, 62, 124, 186, 248, 310, 372, 434, 496, 558, 620, 682, 744, 806, 868, 930]
+
 # lora_checkpoints: [62, 124, 186, 248]
 # lora_checkpoints: [310, 372, 434, 496]
 # lora_checkpoints: [558, 620, 682, 744, 806, 868, 930]

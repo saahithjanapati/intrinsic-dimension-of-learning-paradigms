@@ -57,9 +57,16 @@ def generate_ft_output_path(config, dataset_name):
     lora_r = config.lora_config['r']
 
     if config.finetune_type == "detailed":
-        output_path = Path(f"finetune-outputs/detailed-ft/{config.model_id}-lora_r_{lora_r}/{dataset_name}/")
-        print(f"ft_output_path: {output_path}")
-        return output_path
+
+        if lora_r != 64:
+            output_path = Path(f"finetune-outputs/detailed-ft/{config.model_id}-lora_r_{lora_r}/{dataset_name}/")
+            print(f"ft_output_path: {output_path}")
+            return output_path
+        
+        else:
+            output_path = Path(f"finetune-outputs/detailed-ft/{config.model_id}/{dataset_name}/")
+            print(f"ft_output_path: {output_path}")
+            return output_path
 
     else:
         # TODO: add logic for managing the different ft runs needed for few-sample finetuning

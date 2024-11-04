@@ -17,4 +17,4 @@ module load cuda
 module load cudnn
 
 conda activate lid
-python run_icl_exp.py yaml/icl_exp_6.yaml
+python run_icl_exp.py yaml/icl_exp_3.yaml

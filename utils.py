@@ -192,9 +192,13 @@ def load_dataset(dataset_name: str, max_length: Optional[int] = None) -> List[Di
         raise
 
 
-def load_icl_indices(k: int) -> Dict[int, List[int]]:
+def load_icl_indices(k: int, is_depduped=False) -> Dict[int, List[int]]:
     """Loads indices for ICL evaluation."""
     indices_path = Path('data_indices/') / f"icl_indices_{k}_shot.json"
+
+    if is_depduped:
+        indices_path = Path('data_indices/') / f"no_repeat_icl_indices_{k}_shot.json"
+        
     try:
         print(f"Loading ICL indices from {indices_path}")
         with indices_path.open('r') as file:

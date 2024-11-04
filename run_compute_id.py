@@ -34,8 +34,13 @@ def fetch_tensors_for_few_sample_ft_experiment(model_name, dataset_name, k, laye
 
 
 
-def fetch_tensors_for_detailed_ft_experiment(model_name, dataset_name, k, layer_idx, checkpoint_number, split_name):
-    path_to_tensors = Path(f"results/detailed-ft/activations/{model_name}_checkpoint_{checkpoint_number}/{dataset_name}/{split_name}/{k}-shot/layer-{layer_idx}")
+def fetch_tensors_for_detailed_ft_experiment(model_name, dataset_name, k, layer_idx, checkpoint_number, split_name, lora_r = 64):
+    if lora_r != 64:
+        path_to_tensors = Path(f"results/detailed-ft/activations/{model_name}-lora_r_{lora_r}_checkpoint_{checkpoint_number}/{dataset_name}/{split_name}/{k}-shot/layer-{layer_idx}")
+    
+    else:
+        path_to_tensors = Path(f"results/detailed-ft/activations/{model_name}_checkpoint_{checkpoint_number}/{dataset_name}/{split_name}/{k}-shot/layer-{layer_idx}")
+    
     print("path_to_tensors:", path_to_tensors)
     if not path_to_tensors.exists():
         return None, None
@@ -54,11 +59,17 @@ def process_layers(models, datasets, k_values, methods, fetch_function, result_p
 
                 print("STARTING THE PROCESSING!!!")
 
+                # Dictionary to keep track of the number of tensors used for each layer
+                tensor_counts = {}
+
                 for layer_idx in tqdm(range(0, num_layers), desc='Layers', leave=False):
                     data, filenames = fetch_function(model_name, dataset_name, k, layer_idx, **fetch_kwargs)
 
-                    if data == None and filenames == None:
+                    if data is None and filenames is None:
                         continue
+
+                    # Count the number of tensors used
+                    tensor_counts[layer_idx] = len(data)
 
                     for method in methods:
                         if method[0] == 'mle':
@@ -93,6 +104,11 @@ def process_layers(models, datasets, k_values, methods, fetch_function, result_p
 
                     with save_path.open('w') as f:
                         json.dump(all_results[method], f, indent=4)
+
+                    # Save the tensor counts to the stats path
+                    stats_path = save_path.with_name(save_path.stem + "_stats.json")
+                    with stats_path.open('w') as f:
+                        json.dump(tensor_counts, f, indent=4)
 
                     print("--------------------------------------------------")
 
@@ -156,16 +172,38 @@ def run_detailed_ft_experiment(config):
             str1 = f"{checkpoint_number}"
             str2 = f"{split_name}"
 
-            process_layers(
-                config['models'],
-                config['datasets'],
-                config['num_shots'],
-                config['methods'],
-                fetch_tensors_for_detailed_ft_experiment,
-                "results/id/detailed-ft/{model_name}_checkpoint_" + str1 + "/{dataset_name}/" + str2 + "/{k}-shot/{method_name}.json",
-                checkpoint_number = checkpoint_number,  # Ensure this is passed correctly
-                split_name=split_name
-            )
+            if 'lora_r' in config:
+                lora_r = config['lora_r']
+            else:
+                lora_r = 64
+            
+
+            if lora_r != 64: # non-default value of lora_r
+                process_layers(
+                    config['models'],
+                    config['datasets'],
+                    config['num_shots'],
+                    config['methods'],
+                    fetch_tensors_for_detailed_ft_experiment,
+                    "results/id/detailed-ft/{model_name}-lora_r_" + str(lora_r) + "_checkpoint_" + str1 + "/{dataset_name}/" + str2 + "/{k}-shot/{method_name}.json",
+                    checkpoint_number = checkpoint_number,  # Ensure this is passed correctly
+                    split_name=split_name,
+                    lora_r = lora_r
+                )
+
+
+            else:   # default value of lora_r
+                process_layers(
+                    config['models'],
+                    config['datasets'],
+                    config['num_shots'],
+                    config['methods'],
+                    fetch_tensors_for_detailed_ft_experiment,
+                    "results/id/detailed-ft/{model_name}_checkpoint_" + str1 + "/{dataset_name}/" + str2 + "/{k}-shot/{method_name}.json",
+                    checkpoint_number = checkpoint_number,  # Ensure this is passed correctly
+                    split_name=split_name
+                )
+
 
 def main():
     path_to_yaml = sys.argv[1]
