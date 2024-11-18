@@ -70,6 +70,7 @@ def run_activations(model, tokenizer, model_name, dataset_name, k, split_name):
     logit_dict = {}
 
     batch_size = get_batch_size(model_name, dataset_name, k)
+    # batch_size = 16
     label_set = generate_label_set(dataset_name)
         
     for batch_start_idx in tqdm(range(0, len(dataset), batch_size)):

@@ -1,36 +1,32 @@
 experiment_type: "detailed_ft"
 
 models:
-  - "meta-llama/Meta-Llama-3-8B"
-  # - "meta-llama/Llama-2-13b-hf"
+  - "meta-llama/Llama-2-13b-hf"
+  # - "meta-llama/Meta-Llama-3-8B"
 
 
-lora_r: 128
+lora_r: 64
 
 datasets:
-  - "mnli"
-  - "qqp"
-  - "sst2"
-  - "ag_news"
-  - "cola"
-  - "qnli"
-  - "commonsense_qa"
-
-  
+  # - "mnli"
+  # - "qqp"
+  # - "sst2"
+  # - "ag_news"
+  # - "cola"
   # - "qnli"
   # - "commonsense_qa"
-  # - "mmlu"
+  - "mmlu"
+
+
 
 
 num_shots:
   - 0
 
 
+# checkpoint_numbers: [62, 496, 930]
 
-checkpoint_numbers: [62, 496, 930]
-
-
-# checkpoint_numbers: [0, 62, 124, 186, 248, 310, 372, 434, 496, 558, 620, 682, 744, 806, 868, 930]
+checkpoint_numbers: [0, 62, 124, 186, 248, 310, 372, 434, 496, 558, 620, 682, 744, 806, 868, 930, 945]
 
 # checkpoint_numbers: [0, 248]
 # checkpoint_numbers: [434, 868]

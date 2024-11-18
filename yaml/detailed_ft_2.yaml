@@ -1,9 +1,9 @@
 # config.yaml
 
 # General configuration
-model_id: "meta-llama/Meta-Llama-3-8B"  # Pretrained model to be used for fine-tuning
-# model_id: "meta-llama/Llama-2-13b-hf"  # Pretrained model to be used for fine-tuning
-batch_size: 16  # Batch size per device
+# model_id: "meta-llama/Meta-Llama-3-8B"  # Pretrained model to be used for fine-tuning
+model_id: "meta-llama/Llama-2-13b-hf"  # Pretrained model to be used for fine-tuning
+batch_size: 16 # Batch size per device
 max_seq_length: 1024  # Maximum sequence length
 num_train_epochs: 15  # Number of epochs for training
 load_in_4bit: false  # Load the model in 4-bit precision
@@ -19,7 +19,7 @@ finetune_type: "detailed"  # Type of fine-tuning
 
 
 lora_config:
-  r: 128  # LoRA rank
+  r: 64  # LoRA rank
   lora_alpha: 16  # LoRA alpha
   lora_dropout: 0.1  # Dropout rate for LoRA
   bias: "none"  # Bias handling in LoRA
@@ -33,13 +33,15 @@ lora_config:
 
 
 datasets:
-  - "mnli"
-  - "ag_news"
-  - "cola"
-  - "sst2"
+  # - "mnli"
+  # - "ag_news"
+  # - "cola"
+  # - "sst2"
   - "qqp"
   - "commonsense_qa"
   - "qnli"
+  - "mmlu"
+
 
 # Learning rate configuration
 lr: 1e-4  # Learning rate

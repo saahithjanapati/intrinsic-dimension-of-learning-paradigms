@@ -20,8 +20,6 @@ def set_plot_theme():
     sns.set_palette("deep")
 
 
-
-
 def get_average_accuracy(model, dataset, experiment_type, accuracy_type, checkpoint_number=None, split=None, lora_r=None):
     def load_accuracy(path):
         try:
@@ -356,6 +354,9 @@ def generate_comparison_figures():
     results_dir = "results_and_figures"
     os.makedirs(results_dir, exist_ok=True)
 
+    mle_estimator = "twonn"
+    mle_estimator = "mle_50"
+
     for dataset in datasets:
         fig, axes = plt.subplots(4, 3, figsize=(21, 24))  # 4 models x 3 plots each
 
@@ -407,7 +408,7 @@ def generate_comparison_figures():
             axes[i, 2].tick_params(axis='x', rotation=45)
 
         plt.tight_layout()
-        plot_file = Path(results_dir) / f"comparison-{dataset}.pdf"
+        plot_file = Path(results_dir) / f"comparison-{dataset}-{mle_estimator}.pdf"
         plt.savefig(plot_file)
         plt.close()
 
