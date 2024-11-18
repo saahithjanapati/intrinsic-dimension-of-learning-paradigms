@@ -223,7 +223,7 @@ def generate_auc_boxplot():
     from pathlib import Path
 
     # Set the theme and color palette
-    set_plot_theme()
+    # set_plot_theme()
 
     # Load the AUC data from the saved JSON file
     results_dir = "results_and_figures"
@@ -349,18 +349,27 @@ def generate_inter_method_auc_heatmap():
 
 
 
+
+
 def generate_comparison_figures():
     set_plot_theme()
     results_dir = "results_and_figures"
     os.makedirs(results_dir, exist_ok=True)
 
     mle_estimator = "twonn"
-    mle_estimator = "mle_50"
+
+    # datasets = ["mmlu"]
+    # models = ["meta-llama/Meta-Llama-3-8B",]
 
     for dataset in datasets:
         fig, axes = plt.subplots(4, 3, figsize=(21, 24))  # 4 models x 3 plots each
 
+        # Add dataset name as a bold title at the top of the figure
+        fig.suptitle(f"Dataset: {dataset}", fontsize=24)
+
         for i, model in enumerate(models):
+            model_name = model.split("/")[1].strip("-hf")
+
             # Prepare data for the bar plot (accuracy)
             accuracy_data = []
             auc_data = []
@@ -370,7 +379,7 @@ def generate_comparison_figures():
                 experiment_type_label = "fine-tune" if experiment_type == "finetune 1k" else experiment_type
                 accuracy = get_average_accuracy(model, dataset, experiment_type, accuracy_method)
                 id_values = get_intrinsic_dimensions(model, dataset, experiment_type, mle_estimator)
-
+                
                 if accuracy is not None:
                     accuracy_data.append({'Experiment Type': experiment_type_label, 'Accuracy': accuracy})
 
@@ -386,29 +395,32 @@ def generate_comparison_figures():
 
             # Bar plot for accuracy
             sns.barplot(x='Experiment Type', y='Accuracy', data=accuracy_df, ax=axes[i, 0])
-            axes[i, 0].set_title(f'Accuracy by Experiment Type\nModel: {model.split("/")[1]}, Dataset: {dataset}')
+            axes[i, 0].set_title(f'Accuracy by Experiment Type for {model_name}', fontsize=12)
             axes[i, 0].set_xlabel('Experiment Type')
             axes[i, 0].set_ylabel('Accuracy')
+            axes[i, 0].set_ylim(0, 1)  # Ensure y-axis spans 0-1
             axes[i, 0].tick_params(axis='x', rotation=45)
 
             # Line plot for intrinsic dimension
             for experiment_type_label, id_values in id_data.items():
                 axes[i, 1].plot(range(1, len(id_values) + 1), id_values, label=experiment_type_label)
 
-            axes[i, 1].set_title(f'Intrinsic Dimension by Layer\nModel: {model}, Dataset: {dataset}')
+            axes[i, 1].set_title(f'Intrinsic Dimension Curves for {model_name}', fontsize=12)
             axes[i, 1].set_xlabel('Layer Index')
             axes[i, 1].set_ylabel('Intrinsic Dimension')
             axes[i, 1].legend(title='Experiment Type')
 
             # Bar plot for normalized AUC
             sns.barplot(x='Experiment Type', y='Normalized AUC', data=auc_df, ax=axes[i, 2])
-            axes[i, 2].set_title(f'Normalized AUC by Experiment Type\nModel: {model}, Dataset: {dataset}')
+            axes[i, 2].set_title(f'Normalized AUC by Experiment Type for {model_name}', fontsize=12)
             axes[i, 2].set_xlabel('Experiment Type')
             axes[i, 2].set_ylabel('Normalized AUC')
             axes[i, 2].tick_params(axis='x', rotation=45)
 
-        plt.tight_layout()
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust layout to make room for the suptitle
         plot_file = Path(results_dir) / f"comparison-{dataset}-{mle_estimator}.pdf"
+        # plot_file = Path(results_dir) / f"comparison-{dataset}-{mle_estimator}-single.pdf"
+
         plt.savefig(plot_file)
         plt.close()
 
@@ -418,11 +430,7 @@ def generate_comparison_figures():
 
 
 
-
-
-
-
-def generate_two_column_summary(MODEL_NAME="meta-llama/Meta-Llama-3-8B", dataset="mmlu"):
+def generate_two_column_summary(MODEL_NAME="meta-llama/Meta-Llama-3-8B", dataset="mmlu", include_third_graph=True):
 
     set_plot_theme()
     # Prepare data for the bar plot (accuracy)
@@ -457,12 +465,15 @@ def generate_two_column_summary(MODEL_NAME="meta-llama/Meta-Llama-3-8B", dataset
                 experiment_type = "fine-tune"
             id_data[experiment_type] = id_values
 
-    # Plotting
-    fig, axes = plt.subplots(1, 3, figsize=(21, 6))
+    # Determine the number of subplots based on the include_third_graph flag
+    num_plots = 3 if include_third_graph else 2
+    fig, axes = plt.subplots(1, num_plots, figsize=(21, 6))
+
+    model_name = MODEL_NAME.split("/")[1].strip("-hf")
 
     # Bar plot for accuracy
     sns.barplot(x='Experiment Type', y='Accuracy', data=accuracy_df, ax=axes[0])
-    axes[0].set_title(f'Accuracy by Experiment Type\nModel: {MODEL_NAME}, Dataset: {dataset}')
+    axes[0].set_title(f'Accuracy by Experiment Type\nModel: {model_name}, Dataset: {dataset}')
     axes[0].set_xlabel('Experiment Type')
     axes[0].set_ylabel('Accuracy')
     axes[0].tick_params(axis='x', rotation=45)
@@ -474,17 +485,18 @@ def generate_two_column_summary(MODEL_NAME="meta-llama/Meta-Llama-3-8B", dataset
             experiment_type_label = "fine-tune"
         axes[1].plot(range(1, len(id_values) + 1), id_values, label=experiment_type_label)
 
-    axes[1].set_title(f'Intrinsic Dimension by Layer\nModel: {MODEL_NAME}, Dataset: {dataset}')
+    axes[1].set_title(f'Intrinsic Dimension by Layer\nModel: {model_name}, Dataset: {dataset}')
     axes[1].set_xlabel('Layer Index')
     axes[1].set_ylabel('Intrinsic Dimension')
     axes[1].legend(title='Experiment Type')
 
-    # Bar plot for normalized AUC
-    sns.barplot(x='Experiment Type', y='Normalized AUC', data=auc_df, ax=axes[2])
-    axes[2].set_title(f'Normalized AUC by Experiment Type\nModel: {MODEL_NAME}, Dataset: {dataset}')
-    axes[2].set_xlabel('Experiment Type')
-    axes[2].set_ylabel('Normalized AUC')
-    axes[2].tick_params(axis='x', rotation=45)
+    # Bar plot for normalized AUC, if include_third_graph is True
+    if include_third_graph:
+        sns.barplot(x='Experiment Type', y='Normalized AUC', data=auc_df, ax=axes[2])
+        axes[2].set_title(f'Normalized AUC by Experiment Type\nModel: {model_name}, Dataset: {dataset}')
+        axes[2].set_xlabel('Experiment Type')
+        axes[2].set_ylabel('Normalized AUC')
+        axes[2].tick_params(axis='x', rotation=45)
 
     plt.tight_layout()
 
@@ -908,7 +920,8 @@ def generate_detailed_ft():
 
 def generate_combined_ft_figure_for_model_dataset(
     model="meta-llama/Meta-Llama-3-8B",
-    dataset="mmlu",
+    # dataset="mmlu",
+    dataset = "mmlu",
     split="validation"
 ):
     import matplotlib.pyplot as plt
@@ -962,22 +975,29 @@ def generate_combined_ft_figure_for_model_dataset(
     plt.figure(figsize=(10, 18))
     palette = sns.color_palette("coolwarm", len(checkpoints))
 
+
+    model_name = model.split("/")[1].strip("-hf")
+
+    plt.suptitle(f"Fine-tuning results for {model_name} on {dataset}\n", fontsize=16)
+    plt.tight_layout(rect=[0, 0.2, 1, 0.6])  # Adjust the rect parameter to add more space
+
+
     # Graph 1: Line plot for intrinsic dimension by layer
     plt.subplot(3, 1, 1)
     for idx, (checkpoint, id_values) in enumerate(train_id_data.items()):
         if id_values:
             color = palette[idx]
             plt.plot(range(1, len(id_values) + 1), id_values, label=f'{checkpoint}', color=color)
-    plt.title(f'Intrinsic Dimension by Layer\nModel: {model}, Dataset: {dataset}, Split: {split}')
+    plt.title(f'Intrinsic Dimension Curves for Checkpoints on Validation Split')
     plt.xlabel('Layer Index')
     plt.ylabel('Intrinsic Dimension')
-    plt.legend(title='# Training Steps', loc='upper right')
+    plt.legend(title='# Training Steps', loc='upper left')
 
     # Graph 2: Line plot for training and validation accuracy
     plt.subplot(3, 1, 2)
     plt.plot(checkpoints, training_accuracies, 'go-', label='Training Accuracy')  # Green solid line with dots
     plt.plot(checkpoints, validation_accuracies, 'mo-', label='Validation Accuracy')  # Purple solid line with dots
-    plt.title(f'Accuracy by Checkpoint\nModel: {model}, Dataset: {dataset}')
+    plt.title(f'Accuracy by Checkpoint')
     plt.xlabel('Checkpoint')
     plt.ylabel('Accuracy')
     plt.legend()
@@ -986,7 +1006,7 @@ def generate_combined_ft_figure_for_model_dataset(
     plt.subplot(3, 1, 3)
     plt.plot(checkpoints, train_auc_values, 'go-', label='Training AUC')  # Green solid line with dots
     plt.plot(checkpoints, test_auc_values, 'mo-', label='Validation AUC')  # Purple solid line with dots
-    plt.title(f'AUC of ID Curve by Checkpoint\nModel: {model}, Dataset: {dataset}')
+    plt.title(f'Normalized AUC by Checkpoint')
     plt.xlabel('Checkpoint')
     plt.ylabel('AUC')
     plt.legend()
@@ -1014,7 +1034,8 @@ def generate_combined_ft_figures():
     import seaborn as sns
 
     models = ["meta-llama/Llama-2-13b-hf", "meta-llama/Meta-Llama-3-8B"]
-    datasets = ["qnli", "commonsense_qa", "mmlu"]
+    datasets = ["qnli", "commonsense_qa", "mmlu", "sst2", "cola", "ag_news", "mnli", "qqp"]
+
     checkpoints = [0, 62, 124, 186, 248, 310, 372, 434, 496, 558, 620, 682, 744, 806, 868, 930]
 
     results_dir = "results_and_figures"
@@ -1063,47 +1084,71 @@ def generate_combined_ft_figures():
                     validation_accuracies.append(val_accuracy)
 
             # Create the plots
-            plt.figure(figsize=(18, 6))
+            plt.figure(figsize=(24, 6))
             palette = sns.color_palette("coolwarm", len(checkpoints))
 
-            # Graph 1: Line plot for intrinsic dimension by layer
-            plt.subplot(1, 3, 1)
+            # Flatten the lists of intrinsic dimension values across all checkpoints
+            train_id_values_flat = [value for values in train_id_data.values() for value in values]
+            test_id_values_flat = [value for values in test_id_data.values() for value in values]
+
+            # Calculate the minimum and maximum values across all checkpoints
+            y_min = min(min(train_id_values_flat), min(test_id_values_flat)) - 1
+            y_max = max(max(train_id_values_flat), max(test_id_values_flat)) + 1
+
+
+            model_name = model.split('/')[-1].replace('Llama-', 'llama-').replace('Meta-', 'meta-').replace('-hf', '')
+            # Add a title that spans the entire figure
+            plt.suptitle(f'Model: {model_name}, Dataset: {dataset}', fontsize=16)
+
+            # Graph 1: Line plot for intrinsic dimension by layer (training)
+            plt.subplot(1, 4, 1)
             for idx, (checkpoint, id_values) in enumerate(train_id_data.items()):
                 if id_values:
                     color = palette[idx]
                     plt.plot(range(1, len(id_values) + 1), id_values, label=f'{checkpoint}', color=color)
-            plt.title(f'Intrinsic Dimension by Layer\nModel: {model}, Dataset: {dataset}')
+            plt.title(f'Intrinsic Dimension Curves for Checkpoints on Training Set')
             plt.xlabel('Layer Index')
             plt.ylabel('Intrinsic Dimension')
-            plt.legend(title='# Training Steps', loc='upper right')
+            plt.ylim(y_min, y_max)
+            plt.legend(title='# Training Steps', loc='center right', bbox_to_anchor=(-0.1, 0.5))
 
-            # Graph 2: Line plot for training and validation accuracy
-            plt.subplot(1, 3, 2)
+            # Graph 2: Line plot for intrinsic dimension by layer (validation)
+            plt.subplot(1, 4, 2)
+            for idx, (checkpoint, id_values) in enumerate(test_id_data.items()):
+                if id_values:
+                    color = palette[idx]
+                    plt.plot(range(1, len(id_values) + 1), id_values, label=f'{checkpoint}', color=color)
+            plt.title(f'Intrinsic Dimension Curves for Checkpoints on Validation Set')
+            plt.xlabel('Layer Index')
+            plt.ylabel('Intrinsic Dimension')
+            plt.ylim(y_min, y_max)
+
+
+            # Graph 3: Line plot for training and validation accuracy
+            plt.subplot(1, 4, 3)
             plt.plot(checkpoints, training_accuracies, color='green', linestyle='-', marker='o', label='Training Accuracy')  # Green solid line with dots
             plt.plot(checkpoints, validation_accuracies, color='orange', linestyle='-', marker='o', label='Validation Accuracy')  # Orange solid line with dots
-            plt.title(f'Accuracy by Checkpoint\nModel: {model}, Dataset: {dataset}')
+            plt.title(f'Accuracy by Checkpoint')
             plt.xlabel('Checkpoint')
             plt.ylabel('Accuracy')
             plt.legend()
 
-            # Graph 3: Line plot for training and validation AUC
-            plt.subplot(1, 3, 3)
+            # Graph 4: Line plot for training and validation AUC
+            plt.subplot(1, 4, 4)
             plt.plot(checkpoints, train_auc_values, color='green', linestyle='-', marker='o', label='Training AUC')  # Green solid line with dots
             plt.plot(checkpoints, test_auc_values, color='orange', linestyle='-', marker='o', label='Validation AUC')  # Orange solid line with dots
-            plt.title(f'AUC of ID Curve by Checkpoint\nModel: {model}, Dataset: {dataset}')
+            plt.title(f'Normalized AUC of ID Curve by Checkpoint')
             plt.xlabel('Checkpoint')
-            plt.ylabel('AUC')
+            plt.ylabel('Normalized AUC')
             plt.legend()
 
-            plt.tight_layout()
+            plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust layout to make room for the suptitle
 
             # Save the plot
-            model_name = model.split('/')[-1].replace('Llama-', 'llama-').replace('Meta-', 'meta-').replace('-hf', '')
             plot_file = Path(results_dir) / f"sft-{model_name}-{dataset}.pdf"
             plt.savefig(plot_file)
             plt.close()
 
-            print(f"Combined figure saved to {plot_file}")
 
 
 
@@ -1510,21 +1555,32 @@ def generate_all_icl_figures():
     """
     Generate ICL figures for specified models and datasets, saving each figure with a filename based on the model and dataset.
     """
-    set_plot_theme()
+    # set_plot_theme()
 
     # models = ["meta-llama/Llama-2-13b-hf", "meta-llama/Meta-Llama-3-8B"]
-    models = ["meta-llama/Meta-Llama-3-8B"]
-    datasets = ["ag_news-deduped", "qnli-deduped", "qqp-deduped"]
-    k_values = [0, 1, 2, 5, 7, 10, 12, 14, 16, 18, 20]
+    models = ["meta-llama/Meta-Llama-3-8B", "meta-llama/Llama-2-13b-hf"]
+
+    # datasets = ["ag_news-deduped", "qnli-deduped", "qqp-deduped"]
+    datasets = ["mmlu", "commonsense_qa", "qnli"]
+
+    k_values = [0, 1, 2, 5, 10, 12, 14, 16, 18, 20]
     results_dir = "results_and_figures"
     os.makedirs(results_dir, exist_ok=True)
 
-    mle_estimator = "mle_50"
+    # mle_estimator = "mle_50"
+    mle_estimator = "twonn"
 
     for model in models:
+        model_name = model.split('/')[-1].replace('Llama-', 'llama-').replace('Meta-', 'meta-').replace('-hf', '')
+
         for dataset in datasets:
             # Determine the filename based on the model and dataset
             model_name = model.split('/')[-1].replace('Llama-', 'llama-').replace('Meta-', 'meta-').replace('-hf', '')
+
+            if "-deduped" in dataset:
+                dataset_name = dataset.split('-deduped')[0]
+            else:
+                dataset_name = dataset
             plot_file = Path(results_dir) / f"{model_name}-{dataset}.pdf"
 
             try:
@@ -1551,30 +1607,32 @@ def generate_all_icl_figures():
                 # Create plots
                 fig, axes = plt.subplots(1, 3, figsize=(18, 6))
 
+                fig.suptitle(f'Model: {model_name}, Dataset: {dataset_name}', fontsize=16)
+
                 # Bar plot for accuracy
                 accuracy_df = pd.DataFrame(accuracy_data)
                 sns.barplot(x='k', y='Accuracy', data=accuracy_df, ax=axes[0], palette='tab10')
-                axes[0].set_title(f'Accuracy by k\nModel: {model}, Dataset: {dataset}')
+                axes[0].set_title(f'k vs Accuracy')
                 axes[0].set_xlabel('k')
                 axes[0].set_ylabel('Accuracy')
 
                 # Line plot for ID pattern
-                palette = sns.color_palette('tab10', len(k_values))
+                # distinct_palette = sns.color_palette('hsv', len(k_values))  # Use a distinct color palette
                 for idx, k in enumerate(k_values):
                     experiment_type = f"icl-{k}"
                     id_values = get_intrinsic_dimensions(model, dataset, experiment_type, mle_estimator)
                     if id_values is not None:
-                        axes[1].plot(range(1, len(id_values) + 1), id_values, label=f'k={k}', color=palette[idx])
+                        axes[1].plot(range(1, len(id_values) + 1), id_values, label=f'k={k}')
 
-                axes[1].set_title(f'Intrinsic Dimension by Layer\nModel: {model}, Dataset: {dataset}')
+                axes[1].set_title(f'Intrinsic Dimension by Layer')
                 axes[1].set_xlabel('Layer Index')
                 axes[1].set_ylabel('Intrinsic Dimension')
                 axes[1].legend(title='k')
 
                 # Line plot for AUC of ID curve with dots on each point
                 auc_df = pd.DataFrame(auc_data)
-                sns.lineplot(x='k', y='AUC', data=auc_df, ax=axes[2], palette='tab10', marker='o')
-                axes[2].set_title(f'Normalized AUC of ID Curve by k\nModel: {model}, Dataset: {dataset}')
+                sns.lineplot(x='k', y='AUC', data=auc_df, ax=axes[2], marker='o')
+                axes[2].set_title(f'k vs Normalized AUC of ID Curve')
                 axes[2].set_xlabel('k')
                 axes[2].set_ylabel('Normalized AUC')
                 axes[2].set_xticks(k_values)  # Set integer ticks for x-axis
@@ -1587,7 +1645,6 @@ def generate_all_icl_figures():
 
             except Exception as e:
                 print(f"Error processing model {model} with dataset {dataset}: {e}")
-
 
 
 # def generate_correlation_data():
