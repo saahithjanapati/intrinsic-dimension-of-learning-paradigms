@@ -11,3 +11,4 @@ results_and_figures/
 old_concise_results/
 concise_results/
 deduped*
+.DS_Store
