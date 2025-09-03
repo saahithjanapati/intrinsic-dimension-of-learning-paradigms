@@ -1,4 +1,4 @@
-# Intrinsic Dimension of Learning Paradigms
+# A Comparative Study of Learning Paradigms in Large Language Models via Intrinsic Dimension
 
 Repository accompanying the paper [A Comparative Study of Learning Paradigms in Large Language Models via Intrinsic Dimension](https://aclanthology.org/2025.repl4nlp-1.5/) (RepL4NLP 2025). The code runs Supervised Fine‑Tuning (SFT) and In‑Context Learning (ICL), extracts hidden states, estimates Intrinsic Dimension (ID), and reproduces figures.
 
