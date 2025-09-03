@@ -1,11 +1,11 @@
 # Intrinsic Dimension of Learning Paradigms
 
-Repository accompanying the paper *A Comparative Study of Learning Paradigms in Large Language Models via Intrinsic Dimension* (RepL4NLP 2025). The project compares how **supervised fine‑tuning (SFT)** and **in‑context learning (ICL)** shape the representation space of large language models (LLMs) through intrinsic dimension (ID).
+Repository accompanying the paper [*A Comparative Study of Learning Paradigms in Large Language Models via Intrinsic Dimension*](https://aclanthology.org/2025.repl4nlp-1.5/) (RepL4NLP 2025). The project compares how **supervised fine‑tuning (SFT)** and **in‑context learning (ICL)** shape the representation space of large language models (LLMs) through intrinsic dimension (ID).
 
 ## Highlights
 - LoRA‑based fine‑tuning scripts for open LLMs (Llama‑3‑8B, Llama‑2‑13B, Llama‑2‑7B, Mistral‑7B).
 - Utilities for building few‑shot prompts and running ICL with varying numbers of demonstrations.
-- Tools to collect hidden states, estimate ID using the TwoNN estimator, and compute the normalized area under the ID curve.
+- Tools to collect hidden states, estimate ID using the TwoNN estimator (using a GPU-optimized implementation), and compute the normalized area under the ID curve.
 - Scripts that reproduce the accuracy and ID curves reported in the paper.
 
 ## Getting started
@@ -13,7 +13,7 @@ Repository accompanying the paper *A Comparative Study of Learning Paradigms in 
 git clone https://github.com/your-user/intrinsic-dimension-of-learning-paradigms.git
 cd intrinsic-dimension-of-learning-paradigms
 python -m venv .venv && source .venv/bin/activate
-pip install torch transformers datasets trl peft wandb numpy scipy scikit-learn tqdm
+pip install torch transformers datasets peft wandb numpy scipy scikit-learn tqdm
 ```
 Login to [Weights & Biases](https://wandb.ai) if you wish to log experiments. Dataset splits used in the paper (1000 train / 5000 validation) are provided under `datasets/` and `data_indices/`.
 
@@ -60,5 +60,4 @@ We evaluate four models (Llama‑3‑8B, Llama‑2‑13B, Llama‑2‑7B, Mistra
 ```
 
 ## Acknowledgements
-This work was conducted at the University of Virginia using 6 NVIDIA A6000 GPUs. Refer to individual model licenses for usage restrictions.
-
+This work was conducted with the Rivanna HPC Cluster at the University of Virginia.
