@@ -13,8 +13,6 @@ Repository accompanying the paper [A Comparative Study of Learning Paradigms in 
 - pip install: `torch transformers datasets peft wandb numpy scipy scikit-learn safetensors tqdm seaborn matplotlib fpdf`
 - Optional: W&B for logging (set `WANDB_API_KEY`).
 
-Note: Some paths assume UVA HPC directories. Update the hardcoded cache path if needed:
-- [utils.py:134](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/utils.py#L134), [utils.py:143](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/utils.py#L143), [utils.py:150](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/utils.py#L150), [finetune.py:78](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/finetune.py#L78), [detailed_finetune.py:91](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/detailed_finetune.py#L91) set `cache_dir="/scratch/jax4zk/cache/"`. Replace with your local cache or remove the argument.
 
 ## Repository Map
 - ICL
