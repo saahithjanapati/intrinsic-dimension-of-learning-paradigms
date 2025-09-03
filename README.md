@@ -14,54 +14,54 @@ Repository accompanying the paper [A Comparative Study of Learning Paradigms in 
 - Optional: W&B for logging (set `WANDB_API_KEY`).
 
 Note: Some paths assume UVA HPC directories. Update the hardcoded cache path if needed:
-- `utils.py:134`, `utils.py:143`, `utils.py:150`, `finetune.py:78`, `detailed_finetune.py:91` set `cache_dir="/scratch/jax4zk/cache/"`. Replace with your local cache or remove the argument.
+- [utils.py:134](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/utils.py#L134), [utils.py:143](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/utils.py#L143), [utils.py:150](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/utils.py#L150), [finetune.py:78](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/finetune.py#L78), [detailed_finetune.py:91](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/detailed_finetune.py#L91) set `cache_dir="/scratch/jax4zk/cache/"`. Replace with your local cache or remove the argument.
 
 ## Repository Map
 - ICL
-  - `run_icl_exp.py`: builds k‑shot prompts, logs accuracy, saves last‑token hidden states and logits to `results/icl/...`.
-  - Configs: `yaml/icl_exp_*.yaml` (models, datasets, `num_shots`, `run_activation`, `run_accuracy`, `is_deduped`).
+  - [run_icl_exp.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/run_icl_exp.py): builds k‑shot prompts, logs accuracy, saves last‑token hidden states and logits to `results/icl/...`.
+  - Configs: [`yaml/`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/tree/main/yaml) (`icl_exp_*.yaml`: models, datasets, `num_shots`, `run_activation`, `run_accuracy`, `is_deduped`).
 - SFT (1k samples)
-  - `finetune.py`: trains LoRA adapters; outputs `finetune-outputs/full-ft/<model>/<dataset>/` with `final/` adapter and `training_stats.json`.
-  - `run_ft_exp.py`: loads LoRA adapter (e.g., `adapter_name: final`), evaluates 0‑shot (or optional k‑shot) and writes `results/ft/...`.
-  - Configs: `yaml/finetune_full_1.yaml`, `yaml/ft_exp_1.yaml`.
+  - [finetune.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/finetune.py): trains LoRA adapters; outputs `finetune-outputs/full-ft/<model>/<dataset>/` with `final/` adapter and `training_stats.json`.
+  - [run_ft_exp.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/run_ft_exp.py): loads LoRA adapter (e.g., `adapter_name: final`), evaluates 0‑shot (or optional k‑shot) and writes `results/ft/...`.
+  - Configs: [`yaml/finetune_full_1.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/finetune_full_1.yaml), [`yaml/ft_exp_1.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/ft_exp_1.yaml).
 - SFT (detailed checkpoints)
-  - `detailed_finetune.py`: like `finetune.py`, but used when sweeping checkpoints and LoRA ranks.
-  - `detailed_ft_exp.py`: collects train/validation activations for each checkpoint into `results/detailed-ft/...`.
-  - Configs: `yaml/exp_detailed_ft.yaml` (checkpoint list), ID configs below.
+  - [detailed_finetune.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/detailed_finetune.py): like `finetune.py`, but used when sweeping checkpoints and LoRA ranks.
+  - [detailed_ft_exp.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/detailed_ft_exp.py): collects train/validation activations for each checkpoint into `results/detailed-ft/...`.
+  - Configs: [`yaml/exp_detailed_ft.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/exp_detailed_ft.yaml) (checkpoint list), ID configs below.
 - Few‑sample SFT (e.g., 5 or 10 train samples)
-  - `few_sample_finetune.py`: trains with indices from `data_indices/ft_indices_*.json`.
-  - `run_few_ft_exp.py`: evaluates and saves to `results/few-sample-ft/...`.
-  - Configs: `yaml/finetune_few_sample.yaml`, `yaml/few_sample_ft_exp.yaml`.
+  - [few_sample_finetune.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/few_sample_finetune.py): trains with indices from [`data_indices/`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/tree/main/data_indices) `ft_indices_*.json`.
+  - [run_few_ft_exp.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/run_few_ft_exp.py): evaluates and saves to `results/few-sample-ft/...`.
+  - Configs: [`yaml/finetune_few_sample.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/finetune_few_sample.yaml), [`yaml/few_sample_ft_exp.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/few_sample_ft_exp.yaml).
 - ID estimation
-  - `run_compute_id.py`: reads results and computes ID per layer.
-    - `yaml/compute_id_icl.yaml`, `yaml/compute_id_ft.yaml`, `yaml/compute_id_few_ft.yaml`, `yaml/compute_id_detailed_ft.yaml` choose experiment type, models, datasets, k, and methods.
-  - `calculate_id.py`: TwoNN (`twonn`) and MLE (`mle_k`) estimators.
+  - [run_compute_id.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/run_compute_id.py): reads results and computes ID per layer.
+    - [`yaml/compute_id_icl.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/compute_id_icl.yaml), [`yaml/compute_id_ft.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/compute_id_ft.yaml), [`yaml/compute_id_few_ft.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/compute_id_few_ft.yaml), [`yaml/compute_id_detailed_ft.yaml`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/yaml/compute_id_detailed_ft.yaml) choose experiment type, models, datasets, k, and methods.
+  - [calculate_id.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/calculate_id.py): TwoNN (`twonn`) and MLE (`mle_k`) estimators.
 - Results and figures
-  - `generate_concise_results.py`: copies `results/` to `concise_results/` and writes `accuracy.json` (logit‑based) next to ID outputs.
-  - `generate_results.py`: CLI to build all plots (boxplots, heatmaps, two‑column summaries, SFT‑checkpoint panels).
-  - `generate_results_pdf.py`: optional PDF report with multi‑page figures.
+  - [generate_concise_results.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/generate_concise_results.py): copies `results/` to `concise_results/` and writes `accuracy.json` (logit‑based) next to ID outputs.
+  - [generate_results.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/generate_results.py): CLI to build all plots (boxplots, heatmaps, two‑column summaries, SFT‑checkpoint panels).
+  - [generate_results_pdf.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/generate_results_pdf.py): optional PDF report with multi‑page figures.
 - Utilities & data
-  - `utils.py`: config loading, dataset/json IO, batching, accuracy parsing, hidden‑state save helpers.
-  - `model_util.py`: text generation and last‑token hidden‑state/softmax extraction.
-  - `generate_data_indices.py`: regenerates ICL and few‑FT index maps.
-  - Data: `datasets/*.json`, `data_indices/*.json`.
-  - Slurm templates: `slurm_scripts/*.sbatch` mirror the local commands.
+  - [utils.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/utils.py): config loading, dataset/json IO, batching, accuracy parsing, hidden‑state save helpers.
+  - [model_util.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/model_util.py): text generation and last‑token hidden‑state/softmax extraction.
+  - [generate_data_indices.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/generate_data_indices.py): regenerates ICL and few‑FT index maps.
+  - Data: [`datasets/`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/tree/main/datasets) `*.json`, [`data_indices/`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/tree/main/data_indices) `*.json`.
+  - Slurm templates: [`slurm_scripts/`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/tree/main/slurm_scripts) `*.sbatch` mirror the local commands.
 
 ## Data Format
-- Datasets live under `datasets/` as JSON with keys `train` and `validation` (paper uses 1000/5000).
+- Datasets live under [`datasets/`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/tree/main/datasets) as JSON with keys `train` and `validation` (paper uses 1000/5000).
 - Example item fields:
   - `input`: task prompt without the answer.
   - `output`: gold label token (e.g., `"A"`, `"yes"`, `"positive"`).
   - `combined`: prompt+answer text used for SFT and ICL demonstrations.
-- ICL indices: `data_indices/icl_indices_<k>_shot.json` (default sampling) and `no_repeat_icl_indices_<k>_shot.json` (unique demonstrations across prompts).
-- Few‑FT indices: `data_indices/ft_indices_<N>_samples.json` per training‑set id.
+- ICL indices: [`data_indices/`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/tree/main/data_indices) `icl_indices_<k>_shot.json` (default sampling) and `no_repeat_icl_indices_<k>_shot.json` (unique demonstrations across prompts).
+- Few‑FT indices: [`data_indices/`](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/tree/main/data_indices) `ft_indices_<N>_samples.json` per training‑set id.
 
 To regenerate indices:
 ```bash
 python generate_data_indices.py
 ```
 
-## Typical Workflows
+## Sample Workflow
 - Fine‑tune (1k) then evaluate (0‑shot) and compute ID
   - Train LoRA: `python finetune.py yaml/finetune_full_1.yaml`
   - Evaluate: `python run_ft_exp.py yaml/ft_exp_1.yaml` (use `num_shots: [0]`)
@@ -95,17 +95,8 @@ All generated PDFs go to `results_and_figures/`.
 
 ## Accuracy Metrics
 - Generation accuracy: compares first generated token vs label, saved as `acc-results.json` during `run_*_exp.py`.
-- Logit accuracy: uses last‑token logits over label tokens and `normalize_answer`; written by `generate_concise_results.py` as `accuracy.json` next to ID files. This matches the paper’s evaluation definition.
+- Logit accuracy: uses last‑token logits over label tokens and `normalize_answer`; written by [generate_concise_results.py](https://github.com/saahithjanapati/intrinsic-dimension-of-learning-paradigms/blob/main/generate_concise_results.py) as `accuracy.json` next to ID files. This matches the paper’s evaluation definition.
 
-## Notes & Caveats
-- Paths: adjust cluster‑specific `cache_dir` and `slurm_scripts/*.sbatch` `--chdir` for your environment.
-- Memory: `utils.get_batch_size` auto‑scales by model and k; lower it if you hit OOM.
-- 8‑bit loading: `utils.load_model_and_tokenizer` enables 8‑bit for 70B; you may set `load_in_8bit=True` for other large models if needed.
-
-## File Relevance
-- Core: `run_icl_exp.py`, `run_ft_exp.py`, `detailed_finetune.py`, `detailed_ft_exp.py`, `few_sample_finetune.py`, `run_few_ft_exp.py`, `run_compute_id.py`, `calculate_id.py`, `generate_results.py`, `utils.py`, `model_util.py`.
-- Data/indices: `datasets/*.json`, `data_indices/*.json`, `generate_data_indices.py`.
-- Optional/auxiliary: `generate_results_pdf.py` (PDF report wrapper), notebooks under root for dataset preparation and sanity checks, `slurm_scripts/*` for UVA HPC submission, `test_logit_outputs.ipynb` for debugging.
 
 ## Experiments (Paper Summary)
 - Models: Llama‑3‑8B, Llama‑2‑13B/7B, Mistral‑7B.
