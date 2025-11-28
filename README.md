@@ -2,12 +2,6 @@
 
 Repository accompanying the paper [A Comparative Study of Learning Paradigms in Large Language Models via Intrinsic Dimension](https://aclanthology.org/2025.repl4nlp-1.5/) (RepL4NLP 2025). The code runs Supervised Fine‑Tuning (SFT) and In‑Context Learning (ICL), extracts hidden states, estimates Intrinsic Dimension (ID), and reproduces figures.
 
-## Main Features of the Codebase
-- Fine‑tune with LoRA and evaluate: Llama‑3‑8B, Llama‑2‑13B/7B, Mistral‑7B.
-- ICL pipelines with configurable k‑shot prompting and optional de‑duped demos.
-- Layerwise hidden‑state dumps, TwoNN and MLE ID estimators, normalized AUC.
-- Figure scripts and concise result exports that match the paper’s plots.
-
 ## Environment
 - Python 3.10+, PyTorch with CUDA, and GPUs (experiments were run on a NVIDIA A6000 GPU's on UVA's Rivanna HPC cluster).
 - pip install: `torch transformers datasets peft wandb numpy scipy scikit-learn safetensors tqdm seaborn matplotlib fpdf`
